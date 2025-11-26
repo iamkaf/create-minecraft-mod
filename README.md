@@ -10,7 +10,7 @@ Run the tool and follow the prompts:
 npx create-minecraft-mod
 ```
 
-You’ll be asked to choose things like:
+You'll be asked to choose things like:
 
 * Mod name and ID
 * Package name
@@ -18,6 +18,8 @@ You’ll be asked to choose things like:
 * Mod loaders
 * Optional libraries
 * Optional utility mods
+* Optional sample code (item registration, data generation, commands)
+* Post-creation actions (git init, run gradle, open in IDE)
 * License
 
 A project folder will be created and prepared based on your selections.

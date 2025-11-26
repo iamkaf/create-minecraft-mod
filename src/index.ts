@@ -10,19 +10,8 @@ import {
 } from "@clack/prompts";
 import { inspect } from "util";
 import { formatModId, formatPackageName } from "./util.js";
-
-interface Mod {
-	name: string;
-	id: string;
-	package: string;
-	minecraftVersion: string;
-	loaders: string[];
-	libraries: string[];
-	utility: string[];
-	samples: string[];
-	postActions: string[];
-	license: string;
-}
+import type { Mod } from "./types.js";
+import { runPipeline } from "./core.js";
 
 const mod: Mod = {
 	name: "",
@@ -254,4 +243,11 @@ mod.postActions = postActions as string[];
 // ─── DONE ─────────────────────────────────────────────────
 //
 log.success(`Creating mod with config:\n${inspect(mod, false, null, true)}`);
-outro("Done! Time to bootstrap your mod.");
+
+try {
+	await runPipeline(mod);
+	outro("✅ Mod created successfully! Time to start developing.");
+} catch (error) {
+	cancel(`❌ Failed to create mod: ${error instanceof Error ? error.message : String(error)}`);
+	process.exit(1);
+}
