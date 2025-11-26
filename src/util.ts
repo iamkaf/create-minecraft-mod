@@ -1,3 +1,6 @@
+import { resolve, dirname } from "node:path";
+import { accessSync, constants, readdirSync, existsSync, mkdirSync } from "node:fs";
+
 export function formatModName(input: string) {
 	// Title Case
 	return input
@@ -58,5 +61,42 @@ export function formatPackageName(input: string) {
 	});
 
 	return segments.join(".");
+}
+
+export function validateDestinationPath(path: string): { valid: boolean; error?: string } {
+	try {
+		const resolvedPath = resolve(path);
+
+		// Check if parent directory exists and is writable
+		const parentDir = dirname(resolvedPath);
+
+		// Parent directory must exist and be writable
+		accessSync(parentDir, constants.W_OK);
+
+		// If directory already exists, it must be empty
+		if (existsSync(resolvedPath)) {
+			const files = readdirSync(resolvedPath);
+			if (files.length > 0) {
+				return {
+					valid: false,
+					error: `Directory "${resolvedPath}" already exists and is not empty`
+				};
+			}
+		}
+
+		return { valid: true };
+	} catch (error) {
+		return {
+			valid: false,
+			error: `Cannot write to destination "${path}": ${error instanceof Error ? error.message : String(error)}`
+		};
+	}
+}
+
+export function ensureDirectoryExists(path: string): void {
+	const dir = dirname(path);
+	if (!existsSync(dir)) {
+		mkdirSync(dir, { recursive: true });
+	}
 }
 

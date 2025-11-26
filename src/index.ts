@@ -9,9 +9,32 @@ import {
 	log,
 } from "@clack/prompts";
 import { inspect } from "util";
-import { formatModId, formatPackageName } from "./util.js";
+import { resolve } from "node:path";
+import { parseArguments } from "./cli.js";
+import { formatModId, formatPackageName, validateDestinationPath } from "./util.js";
 import type { Mod } from "./types.js";
 import { runPipeline } from "./core.js";
+
+const args = parseArguments(process.argv);
+
+if (args.help) {
+	console.log(`
+Usage: create-minecraft-mod [destination-path]
+
+Arguments:
+  destination-path    Path where the mod project should be created
+                     (optional, will prompt if not provided)
+
+Options:
+  --help, -h         Show this help message
+
+Examples:
+  create-minecraft-mod ./my-awesome-mod
+  create-minecraft-mod /home/user/projects/my-mod
+  create-minecraft-mod
+  `);
+	process.exit(0);
+}
 
 const mod: Mod = {
 	name: "",
@@ -24,9 +47,44 @@ const mod: Mod = {
 	samples: [],
 	postActions: [],
 	license: "",
+	destinationPath: "",
 };
 
 intro("Time to create a mod!");
+
+let destinationPath: string | undefined = args.destinationPath;
+
+//
+// ─── DESTINATION PATH ───────────────────────────────────────
+//
+if (!destinationPath) {
+	const destResult = await text({
+		message: "Where should the mod be created?",
+		placeholder: "./my-mod",
+		validate(value) {
+			if (!value.trim()) return "Destination path cannot be empty.";
+
+			const validation = validateDestinationPath(value.trim());
+			if (!validation.valid) return validation.error;
+		},
+	});
+
+	if (isCancel(destResult)) {
+		cancel("Operation cancelled.");
+		process.exit(0);
+	}
+
+	destinationPath = String(destResult);
+} else {
+	// Validate provided destination path
+	const validation = validateDestinationPath(destinationPath);
+	if (!validation.valid) {
+		cancel(`Invalid destination path: ${validation.error}`);
+		process.exit(1);
+	}
+}
+
+mod.destinationPath = resolve(destinationPath!);
 
 //
 // ─── MOD NAME ─────────────────────────────────────────────

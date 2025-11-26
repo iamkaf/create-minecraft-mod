@@ -9,4 +9,5 @@ export interface Mod {
   samples: string[];
   postActions: string[];
   license: string;
+  destinationPath: string;
 }
