@@ -61,6 +61,11 @@ export interface TemplateVariables {
 	mod_modrinth_depends: string;
 	mod_curse_depends: string;
 
+	// Loader Selection Variables
+	fabric: boolean;
+	forge: boolean;
+	neoforge: boolean;
+
 	// Java Package Structure Variables
 	package_base: string;
 	package_path: string;
@@ -214,7 +219,7 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 	const neo_form_version = findVersion("neoform") || "";
 	const parchment_minecraft = findVersion("parchment") ? minecraft_version : "";
 	const parchment_version = findVersion("parchment") || "";
-	const mod_menu_version = findVersion("modmenu") || "";
+	const mod_menu_version = mod.utility.includes("modmenu") ? findVersion("modmenu") : undefined;
 	const amber_version = mod.libraries.includes("amber") ? findVersion("amber") : undefined;
 	const cloth_config_version = mod.libraries.includes("cloth-config") ? findVersion("forge-config-api-port") : undefined;
 	const architectury_api_version = mod.libraries.includes("architectury") ? findVersion("architectury-api") : undefined;
@@ -339,5 +344,10 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 		issue_tracker_url: DEFAULT_VARIABLES.issue_tracker_url!,
 		update_json_url: DEFAULT_VARIABLES.update_json_url!,
 		homepage_url: DEFAULT_VARIABLES.homepage_url!,
+
+		// Loader Selection Variables
+		fabric: mod.loaders.includes("fabric"),
+		forge: mod.loaders.includes("forge"),
+		neoforge: mod.loaders.includes("neoforge"),
 	};
 }

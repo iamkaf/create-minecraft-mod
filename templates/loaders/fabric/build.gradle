@@ -12,9 +12,12 @@ dependencies {
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+  {{#if mod_menu_version}}
     modImplementation "com.terraformersmc:modmenu:${mod_menu_version}"
-    // Uncomment the next line if you want to use Amber
-    //modImplementation "com.iamkaf.amber:amber-fabric:${amber_version}"
+{{/if}}
+{{#if amber_version}}
+    modImplementation "com.iamkaf.amber:amber-fabric:${amber_version}"
+{{/if}}
 }
 
 sourceSets.main.resources.srcDir('src/generated/resources')

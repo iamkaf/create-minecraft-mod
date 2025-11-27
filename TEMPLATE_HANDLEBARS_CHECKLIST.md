@@ -100,12 +100,12 @@ templates/
 ### 📋 **PENDING** - Files needing `{{variable}}` substitution
 
 #### Gradle Configuration Files
-- [ ] `base/gradle.properties`
-- [ ] `base/settings.gradle`
-- [ ] `base/gradle/wrapper/gradle-wrapper.properties`
+- [x] `base/gradle.properties` ✅ **COMPLETED** - 55 variables converted with comprehensive conditional logic
+- [x] `base/settings.gradle` ✅ **COMPLETED** - 3 variables converted with loader conditional logic
+- [x] `base/gradle/wrapper/gradle-wrapper.properties` ✅ **COMPLETED** - 1 variable converted (gradle_version)
 
 #### Loader Build Files
-- [ ] `loaders/fabric/build.gradle`
+- [x] `loaders/fabric/build.gradle` ✅ **COMPLETED** - Conditional logic added for optional libraries (modmenu, amber)
 - [ ] `loaders/forge/build.gradle`
 - [ ] `loaders/neoforge/build.gradle`
 
@@ -170,8 +170,8 @@ templates/
 
 ### 🔄 **PROCESSING STATUS**
 - **Total Files**: 34
-- **Completed**: 0
-- **Pending**: 28
+- **Completed**: 4
+- **Pending**: 24
 - **Skip (Generated)**: 3
 - **Skip (Binary/Executable)**: 3
 
