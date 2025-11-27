@@ -68,14 +68,12 @@ async function transformPackageStructure(mod: Mod): Promise<void> {
     }
 
     // Transform loader-specific modules (selected loaders only)
-    // Each loader is a separate Gradle project beside common/
-    for (const loader of mod.loaders) {
-      const loaderPath = path.join(mod.destinationPath, loader, 'src/main/java', templatePackagePath);
-      const loaderNewPath = path.join(mod.destinationPath, loader, 'src/main/java', userPackagePath);
+    // Loader files are copied directly to src/main/java/ in this template structure
+    const srcPath = path.join(mod.destinationPath, 'src/main/java', templatePackagePath);
+    const srcNewPath = path.join(mod.destinationPath, 'src/main/java', userPackagePath);
 
-      if (await fs.access(loaderPath).then(() => true).catch(() => false)) {
-        await fs.rename(loaderPath, loaderNewPath);
-      }
+    if (await fs.access(srcPath).then(() => true).catch(() => false)) {
+      await fs.rename(srcPath, srcNewPath);
     }
 
     s.stop('Package structure transformed');
