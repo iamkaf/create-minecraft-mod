@@ -118,9 +118,9 @@ export const DEFAULT_VARIABLES: Partial<TemplateVariables> = {
 
 	// Java/Minecraft defaults
 	java_version: "21",
-	minecraft_version: "1.21.4",
-	minecraft_version_range: "[1.21.4, 1.22)",
-	fabric_version_range: ">=1.21.4",
+	minecraft_version: "1.21.10",
+	minecraft_version_range: "[1.21.10, 1.22)",
+	fabric_version_range: ">=1.21.10",
 
 	// Configuration defaults
 	mixin_min_version: "0.8",
@@ -130,7 +130,7 @@ export const DEFAULT_VARIABLES: Partial<TemplateVariables> = {
 	release_type: "release",
 	mod_environment: "both",
 	dry_run: true,
-	game_versions: "1.21.4",
+	game_versions: "1.21.10",
 
 	// Default service class names
 	platform_helper_interface: "IPlatformHelper",
@@ -224,12 +224,12 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 
 	// Calculate version ranges
 	const calculateMinecraftRange = (version: string): string => {
-		if (!version) return "[1.21.4, 1.22)"; // fallback
+		if (!version) return "[1.21.10, 1.22)"; // fallback
 
 		const parts = version.split('.');
 		const major = parts[0];
 		const minor = parts[1];
-		if (!major || !minor) return "[1.21.4, 1.22)"; // fallback for malformed version
+		if (!major || !minor) return "[1.21.10, 1.22)"; // fallback for malformed version
 		return `[${version}, ${major}.${parseInt(minor) + 1})`;
 	};
 

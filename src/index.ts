@@ -247,8 +247,8 @@ mod.package = String(modPackage);
 const mcVersion = await select({
 	message: "Minecraft Version",
 	options: [
-		{ value: "1.21.4", label: "1.21.4" },
-		{ value: "1.21.2", label: "1.21.2" },
+		{ value: "1.21.10", label: "1.21.10" },
+		{ value: "1.21.1", label: "1.21.1" },
 		{ value: "1.20.1", label: "1.20.1" },
 	],
 });
