@@ -40,6 +40,10 @@ const mod: Mod = {
 	name: "",
 	id: "",
 	package: "",
+	author: "",
+	description: "",
+	version: "",
+	javaVersion: "",
 	minecraftVersion: "",
 	loaders: [],
 	libraries: [],
@@ -103,6 +107,83 @@ if (isCancel(modName)) {
 }
 
 mod.name = String(modName);
+
+//
+// ─── AUTHOR NAME ───────────────────────────────────────────
+//
+const author = await text({
+	message: "Author Name",
+	placeholder: "Your Name",
+	validate(value) {
+		if (!value.trim()) return "Author name cannot be empty.";
+	},
+});
+
+if (isCancel(author)) {
+	cancel("Operation cancelled.");
+	process.exit(0);
+}
+
+mod.author = String(author);
+
+//
+// ─── MOD DESCRIPTION ───────────────────────────────────────
+//
+const description = await text({
+	message: "Mod Description",
+	placeholder: "A brief description of your mod",
+	validate(value) {
+		if (!value.trim()) return "Description cannot be empty.";
+		if (value.length > 200) return "Description should be under 200 characters.";
+	},
+});
+
+if (isCancel(description)) {
+	cancel("Operation cancelled.");
+	process.exit(0);
+}
+
+mod.description = String(description);
+
+//
+// ─── MOD VERSION ─────────────────────────────────────────────
+//
+const version = await text({
+	message: "Initial Version",
+	placeholder: "1.0.0",
+	initialValue: "1.0.0",
+	validate(value) {
+		if (!value.trim()) return "Version cannot be empty.";
+		if (!/^\d+\.\d+\.\d+/.test(value))
+			return "Version should follow semantic versioning (e.g., 1.0.0)";
+	},
+});
+
+if (isCancel(version)) {
+	cancel("Operation cancelled.");
+	process.exit(0);
+}
+
+mod.version = String(version);
+
+//
+// ─── JAVA VERSION ────────────────────────────────────────────
+//
+const javaVersion = await select({
+	message: "Java Version",
+	options: [
+		{ value: "21", label: "Java 21 (Recommended)" },
+		{ value: "17", label: "Java 17" },
+	],
+	initialValue: "21",
+});
+
+if (isCancel(javaVersion)) {
+	cancel("Operation cancelled.");
+	process.exit(0);
+}
+
+mod.javaVersion = String(javaVersion);
 
 //
 // ─── MOD ID ───────────────────────────────────────────────
@@ -228,7 +309,7 @@ const utilityMods = await multiselect({
 	options: [
 		{ value: "modmenu", label: "Mod Menu (Fabric only)" },
 		{ value: "jei", label: "JEI (Recipe Viewer)" },
-		{ value: "debug-utils", label: "Debug Utils" },
+		{ value: "jade", label: "Jade (Block Inspect Overlay)" },
 	],
 });
 
@@ -248,6 +329,7 @@ const samples = await multiselect({
 		{ value: "item-registration", label: "Item Registration" },
 		{ value: "datagen", label: "Data Generation" },
 		{ value: "commands", label: "Commands" },
+		{ value: "mixin", label: "Mixin Example" },
 	],
 });
 
