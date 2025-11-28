@@ -1,7 +1,6 @@
 import { log } from "@clack/prompts";
-import type { CliArgs } from './cli.js';
 import { validateDestinationPath } from './util.js';
-import { loadConfigFile, configToMod, mergeConfigWithArgs } from './config-loader.js';
+import { loadConfigFile, configToMod, mergeConfigWithArgs, type CliArgs } from './config-loader.js';
 import { runPipeline } from './pipeline-runner.js';
 import { createReporter } from './result-reporter.js';
 

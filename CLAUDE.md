@@ -89,3 +89,7 @@ The core template processing system is implemented and tested. Remaining work in
 - Implementing real library/utility/sample installation functions (currently placeholders)
 - Adding `{{variable}}` substitution to 28 template files (tracked in checklist)
 - Implementing post-creation actions (git init, gradle build, IDE integration)
+
+## Important Notes
+
+- The "${}" variables are for Gradle, not our CLI. Do not touch them, ever.

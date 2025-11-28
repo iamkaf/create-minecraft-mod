@@ -230,6 +230,16 @@ export async function generateServiceRegistrationFiles(mod: Mod): Promise<void> 
       // Create services directory if it doesn't exist
       await fs.mkdir(servicesDir, { recursive: true });
 
+      // Clean up old template service files
+      const oldServiceInterface = 'com.example.modtemplate.platform.services.IPlatformHelper';
+      const oldServiceFile = path.join(servicesDir, oldServiceInterface);
+      try {
+        await fs.unlink(oldServiceFile);
+        console.log(`🧹 Cleaned up old ${loader} service registration file`);
+      } catch (error) {
+        // File doesn't exist, which is fine
+      }
+
       // Determine the platform helper class for this loader
       const platformHelperClass = `${targetPackage}.platform.${loader.charAt(0).toUpperCase() + loader.slice(1)}PlatformHelper`;
 
@@ -434,8 +444,8 @@ export async function applyLicense(mod: Mod): Promise<void> {
     } catch {
       // Fallback to MIT if requested license doesn't exist
       const fallbackTemplate = await fs.readFile(path.join(process.cwd(), 'templates', 'license', 'mit.txt'), 'utf-8');
-      const processedLicense = applyHandlebars(fallbackTemplate, {
-        ...getTemplateVariables(mod),
+      const processedLicense = Handlebars.compile(fallbackTemplate)({
+        ...generateTemplateVariables(mod),
         year: new Date().getFullYear().toString()
       });
       await fs.writeFile(licenseDestPath, processedLicense);
@@ -444,8 +454,8 @@ export async function applyLicense(mod: Mod): Promise<void> {
     }
 
     const licenseTemplate = await fs.readFile(licenseTemplatePath, 'utf-8');
-    const processedLicense = applyHandlebars(licenseTemplate, {
-      ...getTemplateVariables(mod),
+    const processedLicense = Handlebars.compile(licenseTemplate)({
+      ...generateTemplateVariables(mod),
       year: new Date().getFullYear().toString()
     });
 
