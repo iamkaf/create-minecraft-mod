@@ -8,18 +8,22 @@ import {
 	isCancel,
 	log,
 } from "@clack/prompts";
+
+import { UTILITY_MODS } from "./config/index.js";
 import { inspect } from "util";
 import { resolve } from "node:path";
-import { parseArguments } from "./cli.js";
+import { parseArguments, type CliArgs, CLIMode } from "./cli.js";
 import { formatModId, formatPackageName, validateDestinationPath } from "./util.js";
 import type { Mod } from "./types.js";
 import { runPipeline } from "./core.js";
+import { handleHeadlessMode } from "./headless-mode.js";
+import { handleConfigMode } from "./config-mode.js";
 
 const args = parseArguments(process.argv);
 
 if (args.help) {
 	console.log(`
-Usage: create-minecraft-mod [destination-path]
+Usage: create-minecraft-mod [destination-path] [options]
 
 Arguments:
   destination-path    Path where the mod project should be created
@@ -27,13 +31,55 @@ Arguments:
 
 Options:
   --help, -h         Show this help message
+  --ci-mode          Enable non-interactive mode
+  --config <path>    Use JSON configuration file
+  --name <string>    Mod name
+  --author <string>  Mod author
+  --id <string>      Mod ID
+  --minecraft <ver>  Minecraft version
+  --loaders <list>   Comma-separated loaders (fabric,forge,neoforge)
+  --libraries <list> Comma-separated libraries
+  --utility <list>   Comma-separated utility mods
+  --license <type>   License type
+  --skip-gradle      Skip Gradle execution
+  --skip-git         Skip git initialization
+  --skip-ide         Skip IDE opening
+  --output-format    Output format (json,text)
 
 Examples:
-  create-minecraft-mod ./my-awesome-mod
-  create-minecraft-mod /home/user/projects/my-mod
-  create-minecraft-mod
+  create-minecraft-mod ./my-mod                    # Interactive mode
+  create-minecraft-mod ./my-mod --ci-mode --name "My Mod" --author "Me"  # CI mode
+  create-minecraft-mod ./my-mod --config ./config.json  # Config mode
   `);
 	process.exit(0);
+}
+
+// Determine operation mode
+function determineMode(args: CliArgs): CLIMode {
+  if (args.config) {
+    return CLIMode.CONFIG;
+  }
+  if (args.ciMode) {
+    return CLIMode.HEADLESS;
+  }
+  return CLIMode.INTERACTIVE;
+}
+
+const mode = determineMode(args);
+
+// Route to appropriate mode handler
+if (mode !== CLIMode.INTERACTIVE) {
+  try {
+    if (mode === CLIMode.HEADLESS) {
+      await handleHeadlessMode(args);
+    } else if (mode === CLIMode.CONFIG) {
+      await handleConfigMode(args);
+    }
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exit(1);
+  }
+  process.exit(0);
 }
 
 const mod: Mod = {
@@ -303,14 +349,35 @@ mod.libraries = libraries as string[];
 //
 // ─── UTILITY MODS ─────────────────────────────────────────
 //
+// Generate multiselect options from configuration with improved UX
+const getUtilityModOptions = () => {
+	// Create organized options by group with enhanced descriptions
+	return UTILITY_MODS
+		.sort((a, b) => {
+			// Sort by group first, then by display name within each group
+			if (a.ui.group !== b.ui.group) {
+				return (a.ui.group || '').localeCompare(b.ui.group || '');
+			}
+			return a.displayName.localeCompare(b.displayName);
+		})
+		.map(mod => {
+			const option: { value: string; label: string; hint?: string } = {
+				value: mod.id,
+				label: mod.ui.label
+			};
+			if (mod.ui.description) {
+				option.hint = mod.ui.description;
+			}
+			return option;
+		});
+};
+
 const utilityMods = await multiselect({
 	message: "Optional Utility Mods",
-  initialValues: ['modmenu'],
-	options: [
-		{ value: "modmenu", label: "Mod Menu (Fabric only)" },
-		{ value: "jei", label: "JEI (Recipe Viewer)" },
-		{ value: "jade", label: "Jade (Block Inspect Overlay)" },
-	],
+	initialValues: UTILITY_MODS
+		.filter(mod => mod.defaultSelection)
+		.map(mod => mod.id),
+	options: getUtilityModOptions(),
 });
 
 if (isCancel(utilityMods)) {

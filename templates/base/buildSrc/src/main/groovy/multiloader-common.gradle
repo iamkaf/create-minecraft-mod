@@ -99,7 +99,6 @@ processResources {
             'fabric_version_range'         : fabric_version_range,
             'fabric_version'               : fabric_version,
             'fabric_loader_version'        : fabric_loader_version,
-            'mod_menu_version'            : mod_menu_version,
             'mod_name'                     : mod_name,
             'mod_author'                   : mod_author,
             'mod_id'                       : mod_id,
@@ -113,8 +112,13 @@ processResources {
             'java_version'                 : java_version
     ]
 
-    if (project.hasProperty('amber_version')) {
-        expandProps['amber_version'] = project['amber_version']
+    // Handle optional library and utility mod versions
+    ['amber_version', 'mod_menu_version', 'cloth_config_version', 'architectury_api_version',
+     'jei_version', 'rei_version', 'jade_version', 'sodium_version',
+     'forge_config_api_port_version'].each { propName ->
+        if (project.hasProperty(propName)) {
+            expandProps[propName] = project[propName]
+        }
     }
 
     var jsonExpandProps = expandProps.collectEntries {

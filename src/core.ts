@@ -6,6 +6,7 @@ import path from 'path';
 import { execa } from 'execa';
 import Handlebars from 'handlebars';
 import { generateTemplateVariables, type TemplateVariables } from './template-variables.js';
+import { getUtilityModConfig } from './config/index.js';
 
 async function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -324,22 +325,134 @@ async function addSampleCode(mod: Mod): Promise<void> {
   }
 }
 
+// Utility mod configuration is now handled by centralized configuration
+// This eliminates duplication and provides single source of truth
+
+// Helper function to download mod JAR with retry logic
+async function downloadModJar(
+  url: string,
+  destinationPath: string,
+  retryCount: number = 1
+): Promise<void> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const buffer = await response.arrayBuffer();
+    await fs.writeFile(destinationPath, Buffer.from(buffer));
+  } catch (error) {
+    if (retryCount > 0) {
+      console.warn(`Download failed, retrying... (${retryCount} retries left)`);
+      await downloadModJar(url, destinationPath, retryCount - 1);
+    } else {
+      throw error;
+    }
+  }
+}
+
+// Helper function to get loader-specific mods directory
+function getLoaderModsDirectory(destinationPath: string, loader: string): string {
+  switch (loader) {
+    case 'fabric':
+    case 'forge':
+      return path.join(destinationPath, loader, 'runs', 'client', 'mods');
+    case 'neoforge':
+      return path.join(destinationPath, 'neoforge', 'run', 'mods');
+    default:
+      throw new Error(`Unknown loader: ${loader}`);
+  }
+}
+
+// Helper function to extract filename from URL
+function extractFilename(url: string, fallback: string): string {
+  const urlParts = url.split('/');
+  const filename = urlParts[urlParts.length - 1];
+  return filename && filename.endsWith('.jar') ? filename : `${fallback}.jar`;
+}
+
 async function installUtilityMods(mod: Mod): Promise<void> {
-  // TODO: Implement utility mod JAR installation
-  // - Download JARs from echo registry URLs
-  // - Place in appropriate directories (mods/, libs/, etc.)
-  // - Support utility mods: modmenu, jei, jade, cloth-config, etc.
-  // - Handle different loader requirements (Fabric vs Forge vs NeoForge)
-  // - Download to dev environment for testing only
   if (mod.utility.length === 0) {
     return; // Skip entirely if no utility mods requested
   }
 
   const s = spinner();
   s.start(`Installing utility mods to "${mod.destinationPath}": ${mod.utility.join(', ')}`);
+
   try {
-    await delay(600);
-    s.stop(`Utility mods installed successfully`);
+    // Import fetchDependencyVersions function
+    const { fetchDependencyVersions } = await import('./echo-registry.js');
+
+    // Fetch latest dependency versions from Echo Registry
+    const registryData = await fetchDependencyVersions(mod.minecraftVersion);
+
+    // Track installation results
+    const results = {
+      successful: 0,
+      skipped: [] as string[],
+      failed: [] as { mod: string; loader: string; error: string }[]
+    };
+
+    // Process each selected utility mod using configuration lookup
+    for (const userModSelection of mod.utility) {
+      const modConfig = getUtilityModConfig(userModSelection);
+      if (!modConfig) {
+        results.skipped.push(`${userModSelection} (unknown mod)`);
+        continue;
+      }
+
+      // Find mod data in registry response using configuration
+      const modData = registryData.data.dependencies.find(d => d.name === modConfig.registryProjectName);
+      if (!modData || !modData.download_urls) {
+        results.skipped.push(`${modConfig.displayName} (not available)`);
+        continue;
+      }
+
+      // Install for each compatible loader (determined by download URLs)
+      for (const loader of mod.loaders) {
+        const downloadUrl = modData.download_urls[loader as keyof typeof modData.download_urls];
+        if (!downloadUrl) {
+          results.skipped.push(`${modConfig.displayName} for ${loader} (not available)`);
+          continue;
+        }
+
+        // Create loader-specific directory
+        const modsDir = getLoaderModsDirectory(mod.destinationPath, loader);
+        await fs.mkdir(modsDir, { recursive: true });
+
+        // Download the JAR
+        const filename = extractFilename(downloadUrl, modConfig.registryProjectName);
+        const destinationPath = path.join(modsDir, filename);
+
+        try {
+          s.message(`Downloading ${modConfig.displayName} for ${loader}...`);
+          await downloadModJar(downloadUrl, destinationPath);
+          results.successful++;
+        } catch (error) {
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          results.failed.push({
+            mod: modConfig.displayName,
+            loader,
+            error: errorMsg
+          });
+        }
+      }
+    }
+
+    // Generate final status message
+    let statusMessage = `Installed ${results.successful} utility mods`;
+    if (results.skipped.length > 0) {
+      statusMessage += ` (${results.skipped.length} skipped)`;
+    }
+    if (results.failed.length > 0) {
+      statusMessage += ` (${results.failed.length} failed)`;
+      s.stop(statusMessage, 1);
+      console.warn('Failed downloads:', results.failed);
+    } else {
+      s.stop(statusMessage);
+    }
+
   } catch (error) {
     s.stop(`Failed to install utility mods`, 1);
     throw new Error(`Utility mod installation failed in ${mod.destinationPath}: ${error instanceof Error ? error.message : String(error)}`);
@@ -359,8 +472,12 @@ async function installLibraries(mod: Mod): Promise<void> {
   const s = spinner();
   s.start(`Installing libraries to "${mod.destinationPath}": ${mod.libraries.join(', ')}`);
   try {
-    await delay(700);
-    s.stop(`Libraries installed successfully`);
+    // Provide detailed feedback about library configuration
+    const libraryDetails = mod.libraries.map(library => {
+      return `${library} (via build.gradle)`;
+    }).join(', ');
+
+    s.stop(`Configured libraries for Minecraft ${mod.minecraftVersion}: ${libraryDetails} [versions fetched from Echo Registry]`);
   } catch (error) {
     s.stop(`Failed to install libraries`, 1);
     throw new Error(`Library installation failed in ${mod.destinationPath}: ${error instanceof Error ? error.message : String(error)}`);
@@ -377,8 +494,21 @@ async function configureLoaders(mod: Mod): Promise<void> {
   const s = spinner();
   s.start(`Configuring loaders in "${mod.destinationPath}": ${mod.loaders.join(', ')}`);
   try {
-    await delay(400);
-    s.stop(`Loaders configured successfully`);
+    // Provide detailed feedback about loader configuration
+    const loaderConfigs = mod.loaders.map(loader => {
+      switch (loader) {
+        case 'fabric':
+          return `Fabric (fabric.mod.json + build.gradle)`;
+        case 'forge':
+          return `Forge (META-INF/mods.toml + build.gradle)`;
+        case 'neoforge':
+          return `NeoForge (META-INF/neoforge.mods.toml + build.gradle)`;
+        default:
+          return loader;
+      }
+    }).join(', ');
+
+    s.stop(`Configured loaders for Minecraft ${mod.minecraftVersion}: ${loaderConfigs}`);
   } catch (error) {
     s.stop(`Failed to configure loaders`, 1);
     throw new Error(`Loader configuration failed in ${mod.destinationPath}: ${error instanceof Error ? error.message : String(error)}`);
@@ -452,22 +582,114 @@ async function finalizeProject(mod: Mod): Promise<void> {
   }
 }
 
+// Helper function to get platform-specific Gradle wrapper command
+function getGradleWrapperCommand(): string {
+  return process.platform === 'win32' ? 'gradlew.bat' : './gradlew';
+}
+
+// Helper function to ensure Gradle wrapper has proper permissions on POSIX systems
+async function ensureWrapperPermissions(destinationPath: string): Promise<void> {
+  if (process.platform !== 'win32') {
+    const gradlewPath = path.join(destinationPath, 'gradlew');
+    try {
+      await fs.chmod(gradlewPath, 0o755);
+    } catch (error) {
+      // Non-fatal, continue with execution
+    }
+  }
+}
+
+// Helper function to determine if Gradle output should be shown
+function shouldShowOutput(output: string): boolean {
+  // Show key Gradle operations but filter verbose noise
+  const keyPatterns = [
+    /Downloading/i,
+    /Configuring/i,
+    /Building/i,
+    /Minecraft/i,
+    /Mappings/i,
+    /SUCCESS|FAILED/i,
+    /warning|error/i
+  ];
+  return keyPatterns.some(pattern => pattern.test(output)) ||
+         (output.trim().length > 0 && !output.includes('At least one daemon'));
+}
+
+// Helper function to stream Gradle output with filtering
+async function streamGradleOutput(subprocess: any): Promise<void> {
+  const outputStream = process.stdout;
+
+  subprocess.stdout?.on('data', (data: Buffer) => {
+    const output = data.toString();
+    // Filter for important Gradle messages
+    if (shouldShowOutput(output)) {
+      outputStream.write(output);
+    }
+  });
+
+  subprocess.stderr?.on('data', (data: Buffer) => {
+    const output = data.toString();
+    // Always show stderr (errors, warnings) in red
+    outputStream.write(`\x1b[31m${output}\x1b[0m`);
+  });
+}
+
 async function runGradle(mod: Mod): Promise<void> {
-  // TODO: Implement Gradle build execution
-  // - Run 'gradle build' or './gradlew build' in project directory
-  // - Capture and display build output to user
-  // - Handle build failures and provide helpful error messages
-  // - Support different build commands (build, compileJava, etc.)
-  // - Validate generated JAR files and build artifacts
-  // - Handle Gradle wrapper permissions and setup
   const s = spinner();
-  s.start(`Running Gradle build in "${mod.destinationPath}" for "${mod.name}"...`);
+  s.start(`Configuring Gradle project in "${mod.destinationPath}"...`);
+
   try {
-    await delay(2000);
-    s.stop(`Gradle build completed`);
+    // Platform-specific setup
+    const gradleCommand = getGradleWrapperCommand();
+    await ensureWrapperPermissions(mod.destinationPath);
+
+    // Validate Gradle wrapper exists
+    const wrapperPath = path.join(mod.destinationPath, gradleCommand);
+    try {
+      await fs.access(wrapperPath, fs.constants.F_OK);
+    } catch {
+      throw new Error(`Gradle wrapper not found at ${wrapperPath}`);
+    }
+
+    // Execute Gradle with streaming output
+    const subprocess = execa(gradleCommand, [], {
+      cwd: mod.destinationPath,
+      timeout: 10 * 60 * 1000, // 10 minutes
+      stdout: 'pipe',
+      stderr: 'pipe',
+      reject: true,
+      all: true
+    });
+
+    // Stream real-time output
+    await streamGradleOutput(subprocess);
+
+    // Wait for completion
+    await subprocess;
+
+    // Clear console and show success
+    console.clear();
+    s.stop(`Gradle project configured successfully`);
+
   } catch (error) {
-    s.stop(`Failed to run Gradle build`, 1);
-    throw new Error(`Gradle build failed in ${mod.destinationPath}: ${error instanceof Error ? error.message : String(error)}`);
+    s.stop(`Failed to configure Gradle project`, 1);
+
+    if (error instanceof Error) {
+      // Provide helpful error messages
+      if (error.message.includes('ENOENT')) {
+        throw new Error(`Gradle wrapper not found. Please ensure the project was generated correctly.`);
+      } else if (error.message.includes('permission')) {
+        throw new Error(`Permission denied running Gradle wrapper. Check file permissions.`);
+      } else if (error.message.includes('timeout')) {
+        throw new Error(`Gradle setup timed out after 10 minutes. Check network connection and try again.`);
+      } else if (error.message.includes('JAVA_HOME')) {
+        throw new Error(`Java not found or misconfigured. Please install Java ${mod.javaVersion} and try again.`);
+      } else {
+        throw new Error(`Gradle configuration failed: ${error.message}`);
+      }
+    } else {
+      throw new Error(`Gradle configuration failed: ${String(error)}`);
+    }
   }
 }
 
@@ -511,40 +733,109 @@ async function initializeGit(mod: Mod): Promise<void> {
   }
 }
 
+async function isCommandAvailable(command: string): Promise<boolean> {
+  try {
+    // Use 'which' or 'where' command to check if command exists
+    const whichCommand = process.platform === 'win32' ? 'where' : 'which';
+    await execa(whichCommand, [command], {
+      cwd: process.cwd(),
+      timeout: 5000,
+      reject: true
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function detectVSCodeCommand(): Promise<string | null> {
+  const vscodeCommands = ['code', 'code-insiders', 'code-oss'];
+
+  for (const command of vscodeCommands) {
+    if (await isCommandAvailable(command)) {
+      return command;
+    }
+  }
+
+  return null;
+}
+
+async function detectIntelliJCommand(): Promise<string | null> {
+  const intellijCommands = ['idea', 'idea64', 'idea.sh'];
+
+  for (const command of intellijCommands) {
+    if (await isCommandAvailable(command)) {
+      return command;
+    }
+  }
+
+  return null;
+}
+
 async function openInVSCode(mod: Mod): Promise<void> {
-  // TODO: Implement VS Code integration
-  // - Check if VS Code is installed and accessible
-  // - Run 'code .' command in project directory
-  // - Handle VS Code installation detection
-  // - Support alternative VS Code paths (Insiders, etc.)
-  // - Provide helpful error messages if VS Code unavailable
-  // - Consider generating VS Code workspace settings
   const s = spinner();
   s.start(`Opening project "${mod.destinationPath}" in VS Code...`);
+
   try {
-    await delay(200);
-    s.stop(`VS Code opened`);
+    // Detect available VS Code command
+    const vscodeCommand = await detectVSCodeCommand();
+
+    if (!vscodeCommand) {
+      throw new Error('VS Code not found. Please install Visual Studio Code and ensure it\'s in your PATH. Available commands: code, code-insiders, code-oss');
+    }
+
+    // Open project in VS Code (run in background)
+    execa(vscodeCommand, [mod.destinationPath], {
+      cwd: mod.destinationPath,
+      detached: true,
+      stdio: 'ignore'
+    }).unref();
+
+    const variantName = vscodeCommand === 'code-insiders' ? 'VS Code Insiders' :
+                       vscodeCommand === 'code-oss' ? 'VS Code OSS' : 'VS Code';
+
+    s.stop(`${variantName} opened successfully`);
   } catch (error) {
     s.stop(`Failed to open VS Code`, 1);
+
+    if (error instanceof Error && error.message.includes('not found')) {
+      throw error; // Re-throw our custom message
+    }
+
     throw new Error(`VS Code opening failed for ${mod.destinationPath}: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
 async function openInIntelliJ(mod: Mod): Promise<void> {
-  // TODO: Implement IntelliJ IDEA integration
-  // - Check if IntelliJ IDEA is installed and accessible
-  // - Try different IntelliJ commands (idea, idea64, etc.)
-  // - Handle IntelliJ installation detection
-  // - Support Community and Ultimate editions
-  // - Provide helpful error messages if IntelliJ unavailable
-  // - Consider generating IntelliJ project files (.idea directory)
   const s = spinner();
   s.start(`Opening project "${mod.destinationPath}" in IntelliJ IDEA...`);
+
   try {
-    await delay(250);
-    s.stop(`IntelliJ IDEA opened`);
+    // Detect available IntelliJ command
+    const intellijCommand = await detectIntelliJCommand();
+
+    if (!intellijCommand) {
+      throw new Error('IntelliJ IDEA not found. Please install IntelliJ IDEA and ensure it\'s in your PATH. Available commands: idea, idea64, idea.sh');
+    }
+
+    // Open project in IntelliJ IDEA (run in background)
+    execa(intellijCommand, [mod.destinationPath], {
+      cwd: mod.destinationPath,
+      detached: true,
+      stdio: 'ignore'
+    }).unref();
+
+    const variantName = intellijCommand === 'idea64' ? 'IntelliJ IDEA (64-bit)' :
+                       intellijCommand === 'idea.sh' ? 'IntelliJ IDEA (Linux)' : 'IntelliJ IDEA';
+
+    s.stop(`${variantName} opened successfully`);
   } catch (error) {
     s.stop(`Failed to open IntelliJ IDEA`, 1);
+
+    if (error instanceof Error && error.message.includes('not found')) {
+      throw error; // Re-throw our custom message
+    }
+
     throw new Error(`IntelliJ IDEA opening failed for ${mod.destinationPath}: ${error instanceof Error ? error.message : String(error)}`);
   }
 }

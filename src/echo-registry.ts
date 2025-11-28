@@ -1,6 +1,8 @@
 // Echo Registry provides the latest versions of Forge, NeoForge, Fabric, and popular Minecraft mods through a simple REST API and web interface.
 // https://echo.iamkaf.com/
 
+import { getUtilityModProjectNames, getEchoRegistryUrl } from './config/index.js';
+
 export interface EchoRegistryAPIResponse {
   data: Data;
   timestamp: Date;
@@ -181,9 +183,19 @@ type McVersion = string;
 export async function fetchDependencyVersions(
   minecraftVersion: string = "1.21.10"
 ): Promise<EchoRegistryAPIResponse> {
-  const response = await fetch(
-    `https://echo.iamkaf.com/api/versions/dependencies/${minecraftVersion}?projects=amber,fabric-api,modmenu,rei,architectury-api,forge-config-api-port,jade`
-  );
+  // Get utility mod project names from configuration (single source of truth)
+  const utilityModProjects = getUtilityModProjectNames();
+
+  // Core library projects that are always needed (independent of utility mods)
+  const coreProjects = ['amber', 'fabric-api', 'architectury-api', 'forge-config-api-port'];
+
+  // Combine core projects with utility mod projects
+  const allProjects = [...coreProjects, ...utilityModProjects];
+
+  // Use centralized URL builder
+  const apiUrl = getEchoRegistryUrl(minecraftVersion, allProjects);
+
+  const response = await fetch(apiUrl);
   const data = await response.json();
   return data as EchoRegistryAPIResponse;
 }

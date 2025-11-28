@@ -1,5 +1,6 @@
 import type { Mod } from "./types.js";
 import { fetchDependencyVersions, type EchoRegistryAPIResponse } from "./echo-registry.js";
+import { UTILITY_MODS, type UtilityModConfig, URL_BUILDERS } from "./config/index.js";
 
 /**
  * Complete template variable data structure for Minecraft mod generation
@@ -49,7 +50,9 @@ export interface TemplateVariables {
 	cloth_config_version: string | undefined; // Optional
 	architectury_api_version: string | undefined; // Optional
 	jei_version: string | undefined; // Optional
+	rei_version: string | undefined; // Optional
 	jade_version: string | undefined; // Optional
+	sodium_version: string | undefined; // Optional
 	forge_config_api_port_version: string | undefined; // Optional
 
 	// Publishing/Release Variables
@@ -220,12 +223,42 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 	const neo_form_version = findVersion("neoform") || "";
 	const parchment_minecraft = findVersion("parchment") ? minecraft_version : "";
 	const parchment_version = findVersion("parchment") || "";
-	const mod_menu_version = mod.utility.includes("modmenu") ? findVersion("modmenu") : undefined;
+
+	// Configuration-driven utility mod version extraction
+	// This eliminates repetitive code and provides single source of truth
+	const extractUtilityModVersion = (config: UtilityModConfig): string | undefined => {
+		const isInUtility = mod.utility.includes(config.id);
+		const isInLibraries = mod.libraries.includes(config.id);
+
+		// Include this mod if it's selected in utility mods or libraries
+		if (!isInUtility && !isInLibraries) {
+			return undefined;
+		}
+
+		// Use the configuration's version extraction function
+		return config.versions.versionExtraction(fetchedVersions);
+	};
+
+	// Extract versions for all utility mods using configuration
+	const utilityModVersions = UTILITY_MODS.reduce((acc, config) => {
+		const version = extractUtilityModVersion(config);
+		acc[config.versions.templateVariable] = version;
+		return acc;
+	}, {} as Record<string, string | undefined>);
+
+	// Extract individual variables for backward compatibility with template system
+	const {
+		mod_menu_version,
+		jei_version,
+		rei_version,
+		jade_version,
+		sodium_version
+	} = utilityModVersions;
+
+	// Library versions (some have different mapping between UI selection and registry name)
 	const amber_version = mod.libraries.includes("amber") ? findVersion("amber") : undefined;
 	const cloth_config_version = mod.libraries.includes("cloth-config") ? findVersion("forge-config-api-port") : undefined;
 	const architectury_api_version = mod.libraries.includes("architectury") ? findVersion("architectury-api") : undefined;
-	const jei_version = mod.utility.includes("jei") ? findVersion("rei") : undefined;
-	const jade_version = mod.utility.includes("jade") ? findVersion("jade") : undefined;
 	const forge_config_api_port_version = mod.libraries.includes("forge-config-api-port") ? findVersion("forge-config-api-port") : undefined;
 
 	// Calculate version ranges
@@ -255,6 +288,10 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 	const hasAmber = mod.libraries.includes("amber");
 	const mod_modrinth_depends = hasAmber ? "amber" : "";
 	const mod_curse_depends = hasAmber ? "amber-lib" : "";
+
+	// Generate dynamic GitHub URLs using configuration-driven URL builders
+	// This replaces hardcoded placeholder URLs with patterns based on mod information
+	const githubUrls = URL_BUILDERS.githubUrls(mod.author.toLowerCase().replace(/\s+/g, '.'), mod.id);
 
 	return {
 		// Core Project Identity (from user input)
@@ -299,7 +336,9 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 		cloth_config_version,
 		architectury_api_version,
 		jei_version,
+		rei_version,
 		jade_version,
+		sodium_version,
 		forge_config_api_port_version,
 
 		// Publishing/Release Variables
@@ -341,11 +380,11 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 		pack_format_version: DEFAULT_VARIABLES.pack_format_version!,
 		mixin_refmap_name,
 
-		// Repository and URL Variables
-		github_url: DEFAULT_VARIABLES.github_url!,
-		issue_tracker_url: DEFAULT_VARIABLES.issue_tracker_url!,
-		update_json_url: DEFAULT_VARIABLES.update_json_url!,
-		homepage_url: DEFAULT_VARIABLES.homepage_url!,
+		// Repository and URL Variables (now dynamically generated)
+		github_url: githubUrls.repo,
+		issue_tracker_url: githubUrls.issues,
+		update_json_url: githubUrls.updateJson,
+		homepage_url: githubUrls.repo,
 
 		// Loader Selection Variables
 		fabric: mod.loaders.includes("fabric"),
