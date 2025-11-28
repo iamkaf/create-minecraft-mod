@@ -8,8 +8,8 @@ export interface Mod {
   javaVersion: string;
   minecraftVersion: string;
   loaders: string[];
-  libraries: string[];
-  utility: string[];
+  libraries: string[];      // Development libraries that become required when selected
+  mods: string[];          // Runtime mods that remain optional and removable
   samples: string[];
   postActions: string[];
   license: string;

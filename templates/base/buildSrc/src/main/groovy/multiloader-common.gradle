@@ -50,6 +50,19 @@ repositories {
         name = "Kaf Mod Resources"
         url = "https://raw.githubusercontent.com/iamkaf/modresources/main/maven/"
     }
+
+    // Modrinth Maven for runtime mods
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 // Declare capabilities on the outgoing configurations.

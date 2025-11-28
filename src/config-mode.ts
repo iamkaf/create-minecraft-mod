@@ -55,7 +55,7 @@ export async function handleConfigMode(args: CliArgs): Promise<void> {
     log.info(`Author: ${mod.author}`);
     log.info(`Loaders: ${mod.loaders.join(', ')}`);
     log.info(`Libraries: ${mod.libraries.join(', ') || 'None'}`);
-    log.info(`Utility Mods: ${mod.utility.join(', ') || 'None'}`);
+    log.info(`Runtime Mods: ${mod.mods.join(', ') || 'None'}`);
     log.info(`License: ${mod.license}`);
     log.info(`Destination: ${mod.destinationPath}`);
     log.info(`Output Format: ${finalConfig.pipeline.outputFormat || 'text'}`);

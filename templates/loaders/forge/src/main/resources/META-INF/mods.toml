@@ -33,3 +33,35 @@ versionRange = "[${amber_version},)"
 ordering = "BEFORE"
 side = "BOTH"
 {{/if}}
+{{#if cloth_config_version}}
+[[dependencies.${mod_id}]]
+modId = "cloth-config"
+mandatory = true
+versionRange = "[${cloth_config_version},)"
+ordering = "BEFORE"
+side = "BOTH"
+{{/if}}
+{{#if jei_version}}
+[[dependencies.${mod_id}]]
+modId = "jei"
+mandatory = false
+versionRange = "[${jei_version},)"
+ordering = "AFTER"
+side = "BOTH"
+{{/if}}
+{{#if jade_version}}
+[[dependencies.${mod_id}]]
+modId = "jade"
+mandatory = false
+versionRange = "[${jade_version},)"
+ordering = "AFTER"
+side = "BOTH"
+{{/if}}
+{{#if mod_menu_version}}
+[[dependencies.${mod_id}]]
+modId = "modmenu"
+mandatory = false
+versionRange = "[${mod_menu_version},)"
+ordering = "AFTER"
+side = "CLIENT"
+{{/if}}

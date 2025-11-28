@@ -92,4 +92,5 @@ The core template processing system is implemented and tested. Remaining work in
 
 ## Important Notes
 
-- The "${}" variables are for Gradle, not our CLI. Do not touch them, ever.
+- The `${variable}` variables are for Gradle, not CLI. Do NOT touch them, ever.
+- **Mod metadata files MUST use `${variable}` format to reference gradle.properties values.**

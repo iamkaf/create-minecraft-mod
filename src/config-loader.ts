@@ -201,7 +201,7 @@ export function configToMod(config: ModConfigFile, destinationPath: string): Mod
     minecraftVersion: config.mod.minecraftVersion || '1.21.10',
     loaders: config.options.loaders,
     libraries: config.options.libraries || [],
-    utility: config.options.utility || [],
+    mods: config.options.mods || config.options.utility || [],
     samples: [],
     postActions,
     license: config.options.license || 'mit',

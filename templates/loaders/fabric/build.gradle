@@ -12,12 +12,37 @@ dependencies {
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-  {{#if mod_menu_version}}
-    modImplementation "com.terraformersmc:modmenu:${mod_menu_version}"
-{{/if}}
-{{#if amber_version}}
+
+    // Runtime mods (optional, removable)
+    {{#if mod_menu_version}}
+    modImplementation "maven.modrinth:modmenu:${mod_menu_version}-fabric"
+    {{/if}}
+    {{#if jei_version}}
+    modImplementation "maven.modrinth:jei:${jei_version}-fabric"
+    {{/if}}
+    {{#if rei_version}}
+    modImplementation "maven.modrinth:rei:${rei_version}-fabric"
+    {{/if}}
+    {{#if jade_version}}
+    modImplementation "maven.modrinth:jade:${jade_version}-fabric"
+    {{/if}}
+    {{#if sodium_version}}
+    modImplementation "maven.modrinth:sodium:${sodium_version}-fabric"
+    {{/if}}
+
+    // Library dependencies (become required when selected)
+    {{#if amber_version}}
     modImplementation "com.iamkaf.amber:amber-fabric:${amber_version}"
-{{/if}}
+    {{/if}}
+    {{#if architectury_api_version}}
+    modImplementation "dev.architectury:architectury-fabric:${architectury_api_version}"
+    {{/if}}
+    {{#if cloth_config_version}}
+    modApi "me.shedaniel.cloth:cloth-config-fabric:${cloth_config_version}"
+    {{/if}}
+    {{#if forge_config_api_port_version}}
+    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${forge_config_api_port_version}"
+    {{/if}}
 }
 
 sourceSets.main.resources.srcDir('src/generated/resources')

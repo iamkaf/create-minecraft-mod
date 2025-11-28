@@ -8,8 +8,8 @@
         "${mod_author}"
     ],
     "contact": {
-        "homepage": "https://github.com/{{mod_author}}",
-        "sources": "https://github.com/{{mod_author}}/{{mod_id}}"
+        "homepage": "https://github.com/${mod_author}",
+        "sources": "https://github.com/${mod_author}/${mod_id}"
     },
     "license": "${license}",
     "icon": "icon.png",
@@ -34,10 +34,28 @@
         {{#if amber_version}},
         "amber": ">=${amber_version}"
         {{/if}}
+        {{#if architectury_api_version}},
+        "architectury": ">=${architectury_api_version}"
+        {{/if}}
+        {{#if cloth_config_version}},
+        "cloth-config": ">=${cloth_config_version}"
+        {{/if}}
+        {{#if forge_config_api_port_version}},
+        "forgeconfigapiport": ">=${forge_config_api_port_version}"
+        {{/if}}
     },
     "suggests": {
         {{#if mod_menu_version}}
         "modmenu": ">=${mod_menu_version}"
+        {{/if}}
+        {{#if jei_version}}
+        "jei": ">=${jei_version}"
+        {{/if}}
+        {{#if jade_version}}
+        "jade": ">=${jade_version}}"
+        {{/if}}
+        {{#if sodium_version}}
+        "sodium": ">=${sodium_version}"
         {{/if}}
     }
 }

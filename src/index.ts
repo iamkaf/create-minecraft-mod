@@ -9,7 +9,8 @@ import {
 	log,
 } from "@clack/prompts";
 
-import { UTILITY_MODS } from "./config/index.js";
+import { UTILITY_MODS, getLibraryDependencies } from "./config/index.js";
+import { validateModConfiguration, logWarnings } from "./warnings.js";
 import { inspect } from "util";
 import { resolve } from "node:path";
 import { parseArguments, type CliArgs, CLIMode } from "./cli.js";
@@ -39,7 +40,7 @@ Options:
   --minecraft <ver>  Minecraft version
   --loaders <list>   Comma-separated loaders (fabric,forge,neoforge)
   --libraries <list> Comma-separated libraries
-  --utility <list>   Comma-separated utility mods
+  --mods <list>       Comma-separated runtime mods
   --license <type>   License type
   --skip-gradle      Skip Gradle execution
   --skip-git         Skip git initialization
@@ -93,7 +94,7 @@ const mod: Mod = {
 	minecraftVersion: "",
 	loaders: [],
 	libraries: [],
-	utility: [],
+	mods: [],
 	samples: [],
 	postActions: [],
 	license: "",
@@ -330,13 +331,28 @@ mod.loaders = loaders as string[];
 //
 // ─── LIBRARIES ────────────────────────────────────────────
 //
+// Generate library options from the new dependencies configuration
+const getLibraryOptions = () => {
+	return getLibraryDependencies()
+		.sort((a, b) => a.displayName.localeCompare(b.displayName))
+		.map(lib => {
+			const option: { value: string; label: string; hint?: string } = {
+				value: lib.id,
+				label: lib.ui.label
+			};
+			if (lib.ui.description) {
+				option.hint = lib.ui.description;
+			}
+			return option;
+		});
+};
+
 const libraries = await multiselect({
 	message: "Include Libraries?",
-	options: [
-		{ value: "amber", label: "Amber" },
-		{ value: "cloth-config", label: "Cloth Config" },
-		{ value: "architectury", label: "Architectury" },
-	],
+	options: getLibraryOptions(),
+	initialValues: getLibraryDependencies()
+		.filter(lib => lib.defaultSelection)
+		.map(lib => lib.id),
 });
 
 if (isCancel(libraries)) {
@@ -385,7 +401,7 @@ if (isCancel(utilityMods)) {
 	process.exit(0);
 }
 
-mod.utility = utilityMods as string[];
+mod.mods = utilityMods as string[];
 
 //
 // ─── SAMPLE CODE ───────────────────────────────────────────
@@ -447,14 +463,37 @@ if (isCancel(postActions)) {
 mod.postActions = postActions as string[];
 
 //
-// ─── DONE ─────────────────────────────────────────────────
+// ─── VALIDATION ───────────────────────────────────────────────
 //
-log.success(`Creating mod with config:\n${inspect(mod, false, null, true)}`);
+async function validateAndRun() {
+	const validationResult = validateModConfiguration(mod);
 
-try {
-	await runPipeline(mod);
-	outro("✅ Mod created successfully! Time to start developing.");
-} catch (error) {
-	cancel(`❌ Failed to create mod: ${error instanceof Error ? error.message : String(error)}`);
-	process.exit(1);
+	if (!validationResult.valid) {
+		// Show errors and stop
+		log.warn("Configuration validation failed:");
+		await logWarnings(validationResult.warnings);
+		cancel("❌ Cannot proceed with invalid configuration");
+		process.exit(1);
+	}
+
+	if (validationResult.warnings.length > 0) {
+		// Show warnings but continue
+		log.warn("Configuration warnings detected:");
+		await logWarnings(validationResult.warnings);
+	}
+
+	//
+	// ─── DONE ─────────────────────────────────────────────────
+	//
+	log.success(`Creating mod with config:\n${inspect(mod, false, null, true)}`);
+
+	try {
+		await runPipeline(mod);
+		outro("✅ Mod created successfully! Time to start developing.");
+	} catch (error) {
+		cancel(`❌ Failed to create mod: ${error instanceof Error ? error.message : String(error)}`);
+		process.exit(1);
+	}
 }
+
+await validateAndRun();

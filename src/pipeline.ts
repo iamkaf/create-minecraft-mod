@@ -405,7 +405,7 @@ export async function installLibraries(mod: Mod): Promise<void> {
 
 export async function installUtilityMods(mod: Mod): Promise<void> {
   const s = spinner();
-  s.start(`Installing utility mods to "${mod.destinationPath}": ${mod.utility.join(', ')}`);
+  s.start(`Installing runtime mods to "${mod.destinationPath}": ${mod.mods.join(', ')}`);
   try {
     // Import the utility mod installation function from core
     // This will be refactored in the full implementation

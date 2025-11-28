@@ -20,7 +20,7 @@ export interface CliArgs {
   javaVersion?: string;
   loaders?: string;
   libraries?: string;
-  utility?: string;
+  mods?: string;
   license?: string;
   skipGradle?: boolean;
   skipGit?: boolean;
@@ -110,9 +110,9 @@ function parseArguments(args: string[]): CliArgs {
           i++; // Skip next argument
         }
         break;
-      case "--utility":
+      case "--mods":
         if (nextArg && !nextArg.startsWith("-")) {
-          result.utility = nextArg;
+          result.mods = nextArg;
           i++; // Skip next argument
         }
         break;

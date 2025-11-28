@@ -223,7 +223,7 @@ export function createModFromArgs(args: any, destinationPath: string): Mod {
     minecraftVersion: args.minecraft || '1.21.10',
     loaders: args.loaders ? args.loaders.split(',').map((s: string) => s.trim()) : ['fabric'],
     libraries: args.libraries ? args.libraries.split(',').map((s: string) => s.trim()) : [],
-    utility: args.utility ? args.utility.split(',').map((s: string) => s.trim()) : [],
+    mods: args.mods ? args.mods.split(',').map((s: string) => s.trim()) : [],
     samples: [],
     postActions: ['git-init', 'run-gradle'],
     license: args.license || 'mit',

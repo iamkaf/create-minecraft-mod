@@ -1,7 +1,22 @@
 import type { EchoRegistryAPIResponse } from '../echo-registry.js';
+import {
+  DEPENDENCIES,
+  getDependenciesByType,
+  type ModLoader,
+  type DependencyCategory,
+  type DependencyConfig
+} from './dependencies.js';
 
-export type ModLoader = 'fabric' | 'forge' | 'neoforge';
 export type UtilityModCategory = 'utility' | 'performance' | 'recipe-viewer' | 'integration';
+
+// Backward compatibility: map DependencyCategory to UtilityModCategory
+const categoryMapping: Record<DependencyCategory, UtilityModCategory> = {
+  'utility': 'utility',
+  'performance': 'performance',
+  'recipe-viewer': 'recipe-viewer',
+  'integration': 'integration',
+  'development': 'utility' // Map development to utility for backward compatibility
+};
 
 export interface UtilityModConfig {
   id: string;
@@ -24,109 +39,28 @@ export interface UtilityModConfig {
 }
 
 /**
- * Helper function to find version in Echo Registry response
+ * Backward compatibility: Convert new DependencyConfig to legacy UtilityModConfig
  */
-function findVersion(data: EchoRegistryAPIResponse, projectName: string): string | undefined {
-  const dependency = data.data.dependencies.find(dep => dep.name === projectName);
-  return dependency?.version || undefined;
+function dependencyToUtilityMod(dep: DependencyConfig): UtilityModConfig {
+  return {
+    id: dep.id,
+    displayName: dep.displayName,
+    description: dep.description,
+    category: categoryMapping[dep.category] || 'utility',
+    registryProjectName: dep.registryProjectName,
+    compatibleLoaders: dep.compatibleLoaders,
+    defaultSelection: dep.defaultSelection,
+    ui: dep.ui,
+    versions: dep.versions
+  };
 }
 
 /**
- * Master configuration for all utility mods
- * This serves as the single source of truth for utility mod data
+ * Backward compatibility: Get only mod-type dependencies as utility mods
+ * (Filters out libraries like Amber, Architectury API, etc.)
  */
-export const UTILITY_MODS: UtilityModConfig[] = [
-  {
-    id: 'modmenu',
-    displayName: 'Mod Menu',
-    description: 'In-game mod configuration menu',
-    category: 'utility',
-    registryProjectName: 'modmenu',
-    compatibleLoaders: ['fabric'], // Note: Only works on Fabric based on current mappings
-    defaultSelection: true,
-    ui: {
-      label: '🔧 Mod Menu',
-      description: 'Configure mods in-game with a clean interface',
-      group: 'Utilities'
-    },
-    versions: {
-      templateVariable: 'mod_menu_version',
-      versionExtraction: (data) => findVersion(data, 'modmenu')
-    }
-  },
-  {
-    id: 'jei',
-    displayName: 'Just Enough Items',
-    description: 'Recipe and item information viewer',
-    category: 'recipe-viewer',
-    registryProjectName: 'jei',
-    compatibleLoaders: ['fabric', 'forge', 'neoforge'],
-    defaultSelection: false,
-    ui: {
-      label: '📖 JEI - Recipe Viewer',
-      description: 'View item recipes, uses, and properties',
-      group: 'Recipe Viewers'
-    },
-    versions: {
-      templateVariable: 'jei_version',
-      versionExtraction: (data) => findVersion(data, 'jei')
-    }
-  },
-  {
-    id: 'rei',
-    displayName: 'Roughly Enough Items',
-    description: 'Recipe and item information viewer',
-    category: 'recipe-viewer',
-    registryProjectName: 'rei',
-    compatibleLoaders: ['fabric', 'forge', 'neoforge'],
-    defaultSelection: false,
-    ui: {
-      label: '📚 REI - Recipe Viewer',
-      description: 'View item recipes and usage information',
-      group: 'Recipe Viewers'
-    },
-    versions: {
-      templateVariable: 'rei_version',
-      versionExtraction: (data) => findVersion(data, 'rei')
-    }
-  },
-  {
-    id: 'jade',
-    displayName: 'Jade HUD',
-    description: 'Block and entity information overlay',
-    category: 'utility',
-    registryProjectName: 'jade',
-    compatibleLoaders: ['fabric', 'forge', 'neoforge'],
-    defaultSelection: false,
-    ui: {
-      label: '💎 Jade - Block Inspector',
-      description: 'Show block and entity information on hover',
-      group: 'Utilities'
-    },
-    versions: {
-      templateVariable: 'jade_version',
-      versionExtraction: (data) => findVersion(data, 'jade')
-    }
-  },
-  {
-    id: 'sodium',
-    displayName: 'Sodium',
-    description: 'Performance optimization mod',
-    category: 'performance',
-    registryProjectName: 'sodium',
-    compatibleLoaders: ['fabric', 'forge', 'neoforge'],
-    defaultSelection: false,
-    ui: {
-      label: '⚡ Sodium - Performance',
-      description: 'Major performance improvements and optimizations',
-      group: 'Performance'
-    },
-    versions: {
-      templateVariable: 'sodium_version',
-      versionExtraction: (data) => findVersion(data, 'sodium')
-    }
-  }
-];
+export const UTILITY_MODS: UtilityModConfig[] = getDependenciesByType('mod')
+  .map(dependencyToUtilityMod);
 
 /**
  * Get utility mod configuration by ID

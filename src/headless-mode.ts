@@ -53,7 +53,7 @@ export async function handleHeadlessMode(args: CliArgs): Promise<void> {
     log.info(`Author: ${mod.author}`);
     log.info(`Loaders: ${mod.loaders.join(', ')}`);
     log.info(`Libraries: ${mod.libraries.join(', ') || 'None'}`);
-    log.info(`Utility Mods: ${mod.utility.join(', ') || 'None'}`);
+    log.info(`Runtime Mods: ${mod.mods.join(', ') || 'None'}`);
     log.info(`Destination: ${mod.destinationPath}`);
 
     // Run the pipeline
@@ -137,7 +137,7 @@ Optional Options:
   --java-version <string>       Java version (default: 21)
   --loaders <list>             Comma-separated loaders (fabric,forge,neoforge)
   --libraries <list>           Comma-separated libraries
-  --utility <list>             Comma-separated utility mods
+  --mods <list>                Comma-separated runtime mods
   --license <type>             License type (mit,lgpl,arr)
   --skip-gradle               Skip Gradle execution
   --skip-git                  Skip git initialization

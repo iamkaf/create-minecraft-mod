@@ -23,8 +23,19 @@ dependencies {
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.4.1'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
 
-    // Uncomment this line if you want to use Amber
-    // implementation group: 'com.iamkaf.amber', name: 'amber-common', version: amber_version
+    // Library dependencies (add conditionally based on user selection)
+    {{#if amber_version}}
+    implementation group: 'com.iamkaf.amber', name: 'amber-common', version: amber_version
+    {{/if}}
+    {{#if architectury_api_version}}
+    implementation group: 'dev.architectury', name: 'architectury-common', version: architectury_api_version
+    {{/if}}
+    {{#if cloth_config_version}}
+    api group: 'me.shedaniel.cloth', name: 'cloth-config-common', version: cloth_config_version
+    {{/if}}
+    {{#if forge_config_api_port_version}}
+    api group: 'fuzs.forgeconfigapiport', name: 'forgeconfigapiport-common-neoforgeapi', version: forge_config_api_port_version
+    {{/if}}
 }
 
 configurations {

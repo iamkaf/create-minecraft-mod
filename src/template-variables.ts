@@ -1,6 +1,7 @@
 import type { Mod } from "./types.js";
 import { fetchDependencyVersions, type EchoRegistryAPIResponse } from "./echo-registry.js";
-import { UTILITY_MODS, type UtilityModConfig, URL_BUILDERS } from "./config/index.js";
+import { UTILITY_MODS, type UtilityModConfig, URL_BUILDERS, getDependencyConfig, getLibraryDependencies, getModDependencies } from "./config/index.js";
+import { extractCleanVersion } from "./echo-registry.js";
 
 /**
  * Complete template variable data structure for Minecraft mod generation
@@ -224,14 +225,14 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 	const parchment_minecraft = findVersion("parchment") ? minecraft_version : "";
 	const parchment_version = findVersion("parchment") || "";
 
-	// Configuration-driven utility mod version extraction
+	// Configuration-driven dependency version extraction
 	// This eliminates repetitive code and provides single source of truth
-	const extractUtilityModVersion = (config: UtilityModConfig): string | undefined => {
-		const isInUtility = mod.utility.includes(config.id);
+	const extractDependencyVersion = (config: UtilityModConfig): string | undefined => {
+		const isInMods = mod.mods.includes(config.id);
 		const isInLibraries = mod.libraries.includes(config.id);
 
-		// Include this mod if it's selected in utility mods or libraries
-		if (!isInUtility && !isInLibraries) {
+		// Include this dependency if it's selected in mods or libraries
+		if (!isInMods && !isInLibraries) {
 			return undefined;
 		}
 
@@ -239,27 +240,39 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 		return config.versions.versionExtraction(fetchedVersions);
 	};
 
-	// Extract versions for all utility mods using configuration
-	const utilityModVersions = UTILITY_MODS.reduce((acc, config) => {
-		const version = extractUtilityModVersion(config);
-		acc[config.versions.templateVariable] = version;
-		return acc;
-	}, {} as Record<string, string | undefined>);
+	// Extract versions for all runtime mods using new dependency system with Maven coordinate extraction
+	const extractModVersion = (modId: string, registryName: string): string | undefined => {
+		if (!mod.mods.includes(modId)) return undefined;
 
-	// Extract individual variables for backward compatibility with template system
-	const {
-		mod_menu_version,
-		jei_version,
-		rei_version,
-		jade_version,
-		sodium_version
-	} = utilityModVersions;
+		const dependency = dependencies.find(d => d.name === registryName);
+		if (!dependency?.coordinates) return findVersion(registryName);
 
-	// Library versions (some have different mapping between UI selection and registry name)
-	const amber_version = mod.libraries.includes("amber") ? findVersion("amber") : undefined;
-	const cloth_config_version = mod.libraries.includes("cloth-config") ? findVersion("forge-config-api-port") : undefined;
-	const architectury_api_version = mod.libraries.includes("architectury") ? findVersion("architectury-api") : undefined;
-	const forge_config_api_port_version = mod.libraries.includes("forge-config-api-port") ? findVersion("forge-config-api-port") : undefined;
+		// Extract clean version from Maven coordinates
+		return extractCleanVersion(dependency.coordinates);
+	};
+
+	// Extract individual mod variables
+	const mod_menu_version = extractModVersion("modmenu", "modmenu");
+	const jei_version = extractModVersion("jei", "jei");
+	const rei_version = extractModVersion("rei", "rei");
+	const jade_version = extractModVersion("jade", "jade");
+	const sodium_version = extractModVersion("sodium", "sodium");
+
+	// Library versions using the new dependency system with Maven coordinate extraction
+	const extractLibraryVersion = (libraryId: string, registryName: string): string | undefined => {
+		if (!mod.libraries.includes(libraryId)) return undefined;
+
+		const dependency = dependencies.find(d => d.name === registryName);
+		if (!dependency?.coordinates) return findVersion(registryName);
+
+		// Extract clean version from Maven coordinates
+		return extractCleanVersion(dependency.coordinates);
+	};
+
+	const amber_version = extractLibraryVersion("amber", "amber");
+	const cloth_config_version = extractLibraryVersion("cloth-config", "cloth-config");
+	const architectury_api_version = extractLibraryVersion("architectury", "architectury-api");
+	const forge_config_api_port_version = extractLibraryVersion("forge-config-api-port", "forge-config-api-port");
 
 	// Calculate version ranges
 	const calculateMinecraftRange = (version: string): string => {

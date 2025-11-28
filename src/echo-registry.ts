@@ -1,7 +1,7 @@
 // Echo Registry provides the latest versions of Forge, NeoForge, Fabric, and popular Minecraft mods through a simple REST API and web interface.
 // https://echo.iamkaf.com/
 
-import { getUtilityModProjectNames, getEchoRegistryUrl } from './config/index.js';
+import { getUtilityModProjectNames, getEchoRegistryUrl, getDependencyProjectNames } from './config/index.js';
 
 export interface EchoRegistryAPIResponse {
   data: Data;
@@ -23,6 +23,7 @@ export interface Dependency {
   notes?: string;
   fallback_used: boolean;
   download_urls?: DownloadUrls;
+  coordinates?: string; // Maven coordinates for Modrinth Maven integration
 }
 
 // url to download the jars
@@ -180,17 +181,58 @@ Sample response:
 
 type McVersion = string;
 
+/**
+ * Extract clean version from Maven coordinates by removing loader suffixes
+ * Used to generate gradle.properties variables
+ *
+ * Handles both legacy (-loader) and current (+loader) suffix formats:
+ * - "18.0.6+neoforge" → "18.0.6"
+ * - "20.0.149+fabric" → "20.0.149"
+ * - "1.0.0-forge" → "1.0.0"
+ * - "group:artifact:18.0.6+neoforge" → "18.0.6"
+ */
+export function extractCleanVersion(coordinates?: string): string | undefined {
+  if (!coordinates) return undefined;
+
+  // Extract version part after the last colon
+  const version = coordinates.split(':').pop();
+  if (!version) return undefined;
+
+  // Remove any existing loader suffixes (both -loader and +loader formats)
+  // Handle patterns like: "18.0.6+neoforge", "20.0.149+fabric", "1.0.0-forge"
+  return version.replace(/[+-](fabric|neoforge|forge)$/, '');
+}
+
+/**
+ * Process Maven coordinates for template variable generation
+ * Returns clean version for gradle.properties and handles loader suffixes in templates
+ */
+export function processMavenCoordinates(
+  coordinates?: string,
+  loader?: 'fabric' | 'forge' | 'neoforge'
+): {
+  cleanVersion?: string;
+  templateVariable?: string;
+} {
+  const cleanVersion = extractCleanVersion(coordinates);
+
+  if (!cleanVersion) {
+    return {};
+  }
+
+  // For template variables, we'll use the clean version
+  // Template files will handle adding loader suffixes
+  return {
+    cleanVersion,
+    templateVariable: cleanVersion
+  };
+}
+
 export async function fetchDependencyVersions(
   minecraftVersion: string = "1.21.10"
 ): Promise<EchoRegistryAPIResponse> {
-  // Get utility mod project names from configuration (single source of truth)
-  const utilityModProjects = getUtilityModProjectNames();
-
-  // Core library projects that are always needed (independent of utility mods)
-  const coreProjects = ['amber', 'fabric-api', 'architectury-api', 'forge-config-api-port'];
-
-  // Combine core projects with utility mod projects
-  const allProjects = [...coreProjects, ...utilityModProjects];
+  // Get all dependency project names from the new configuration system
+  const allProjects = getDependencyProjectNames();
 
   // Use centralized URL builder
   const apiUrl = getEchoRegistryUrl(minecraftVersion, allProjects);

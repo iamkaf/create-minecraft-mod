@@ -25,9 +25,35 @@ plugins {
 
 dependencyResolutionManagement {
     repositories {
+        // Development repositories for libraries
         maven {
             name = "Kaf Mod Resources"
             url = "https://raw.githubusercontent.com/iamkaf/modresources/main/maven/"
+        }
+        maven {
+            name = "Architectury"
+            url = "https://maven.architectury.dev/"
+        }
+        maven {
+            name = "Cloth Config"
+            url = "https://maven.shedaniel.me/"
+        }
+        maven {
+            name = "Fuzs Mod Resources"
+            url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+        }
+
+        // Modrinth Maven for runtime mods
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = "Modrinth"
+                    url = "https://api.modrinth.com/maven"
+                }
+            }
+            filter {
+                includeGroup "maven.modrinth"
+            }
         }
     }
 }

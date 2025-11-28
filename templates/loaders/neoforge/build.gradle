@@ -5,9 +5,32 @@ plugins {
 }
 
 dependencies {
+    // Runtime mods (optional, removable)
+    {{#if jei_version}}
+    modImplementation "maven.modrinth:jei:${jei_version}-neoforge"
+    {{/if}}
+    {{#if rei_version}}
+    modImplementation "maven.modrinth:rei:${rei_version}-neoforge"
+    {{/if}}
+    {{#if jade_version}}
+    modImplementation "maven.modrinth:jade:${jade_version}-neoforge"
+    {{/if}}
+    {{#if sodium_version}}
+    modImplementation "maven.modrinth:sodium:${sodium_version}-neoforge"
+    {{/if}}
+
+    // Library dependencies (become required when selected)
     {{#if amber_version}}
-    // Amber
     implementation "com.iamkaf.amber:amber-neoforge:${amber_version}"
+    {{/if}}
+    {{#if architectury_api_version}}
+    implementation "dev.architectury:architectury-neoforge:${architectury_api_version}"
+    {{/if}}
+    {{#if cloth_config_version}}
+    modApi "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
+    {{/if}}
+    {{#if forge_config_api_port_version}}
+    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-neoforge:${forge_config_api_port_version}"
     {{/if}}
 }
 

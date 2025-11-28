@@ -373,89 +373,71 @@ function extractFilename(url: string, fallback: string): string {
 }
 
 async function installUtilityMods(mod: Mod): Promise<void> {
-  if (mod.utility.length === 0) {
-    return; // Skip entirely if no utility mods requested
+  if (mod.mods.length === 0) {
+    return; // Skip entirely if no runtime mods requested
   }
 
   const s = spinner();
-  s.start(`Installing utility mods to "${mod.destinationPath}": ${mod.utility.join(', ')}`);
+  s.start(`Configuring runtime mods for Gradle Maven resolution: ${mod.mods.join(', ')}`);
 
   try {
-    // Import fetchDependencyVersions function
-    const { fetchDependencyVersions } = await import('./echo-registry.js');
+    // Import dependency system functions
+    const { getDependencyConfig } = await import('./config/index.js');
 
-    // Fetch latest dependency versions from Echo Registry
-    const registryData = await fetchDependencyVersions(mod.minecraftVersion);
-
-    // Track installation results
+    // Track configuration results
     const results = {
-      successful: 0,
+      configured: 0,
       skipped: [] as string[],
-      failed: [] as { mod: string; loader: string; error: string }[]
+      failed: [] as string[]
     };
 
-    // Process each selected utility mod using configuration lookup
-    for (const userModSelection of mod.utility) {
-      const modConfig = getUtilityModConfig(userModSelection);
-      if (!modConfig) {
-        results.skipped.push(`${userModSelection} (unknown mod)`);
+    // Process each selected runtime mod
+    for (const modSelection of mod.mods) {
+      const dependencyConfig = getDependencyConfig(modSelection);
+      if (!dependencyConfig) {
+        results.skipped.push(`${modSelection} (unknown dependency)`);
         continue;
       }
 
-      // Find mod data in registry response using configuration
-      const modData = registryData.data.dependencies.find(d => d.name === modConfig.registryProjectName);
-      if (!modData || !modData.download_urls) {
-        results.skipped.push(`${modConfig.displayName} (not available)`);
+      // Only process mod-type dependencies
+      if (dependencyConfig.type !== 'mod') {
+        results.skipped.push(`${dependencyConfig.displayName} (not a runtime mod)`);
         continue;
       }
 
-      // Install for each compatible loader (determined by download URLs)
-      for (const loader of mod.loaders) {
-        const downloadUrl = modData.download_urls[loader as keyof typeof modData.download_urls];
-        if (!downloadUrl) {
-          results.skipped.push(`${modConfig.displayName} for ${loader} (not available)`);
-          continue;
-        }
+      // Check if mod is compatible with selected loaders
+      const compatibleLoaders = mod.loaders.filter(loader =>
+        dependencyConfig.compatibleLoaders.includes(loader as any)
+      );
 
-        // Create loader-specific directory
-        const modsDir = getLoaderModsDirectory(mod.destinationPath, loader);
-        await fs.mkdir(modsDir, { recursive: true });
-
-        // Download the JAR
-        const filename = extractFilename(downloadUrl, modConfig.registryProjectName);
-        const destinationPath = path.join(modsDir, filename);
-
-        try {
-          s.message(`Downloading ${modConfig.displayName} for ${loader}...`);
-          await downloadModJar(downloadUrl, destinationPath);
-          results.successful++;
-        } catch (error) {
-          const errorMsg = error instanceof Error ? error.message : String(error);
-          results.failed.push({
-            mod: modConfig.displayName,
-            loader,
-            error: errorMsg
-          });
-        }
+      if (compatibleLoaders.length === 0) {
+        results.skipped.push(`${dependencyConfig.displayName} (no compatible loaders)`);
+        continue;
       }
+
+      // Note: Runtime mods are now handled via Maven dependencies in build.gradle
+      // The template system already includes the modImplementation declarations
+      // This function validates compatibility and provides user feedback
+      results.configured++;
     }
 
     // Generate final status message
-    let statusMessage = `Installed ${results.successful} utility mods`;
+    let statusMessage = `Configured ${results.configured} runtime mods for Maven resolution`;
     if (results.skipped.length > 0) {
       statusMessage += ` (${results.skipped.length} skipped)`;
     }
+
     if (results.failed.length > 0) {
       statusMessage += ` (${results.failed.length} failed)`;
       s.stop(statusMessage, 1);
-      console.warn('Failed downloads:', results.failed);
+      console.warn('Failed configurations:', results.failed);
     } else {
       s.stop(statusMessage);
     }
 
   } catch (error) {
-    s.stop(`Failed to install utility mods`, 1);
-    throw new Error(`Utility mod installation failed in ${mod.destinationPath}: ${error instanceof Error ? error.message : String(error)}`);
+    s.stop(`Failed to configure runtime mods`, 1);
+    throw new Error(`Runtime mod configuration failed in ${mod.destinationPath}: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
