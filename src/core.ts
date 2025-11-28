@@ -3,6 +3,7 @@ import { spinner } from "@clack/prompts";
 import { ensureDirectoryExists } from "./util.js";
 import { promises as fs } from 'fs';
 import path from 'path';
+import { execa } from 'execa';
 import Handlebars from 'handlebars';
 import { generateTemplateVariables, type TemplateVariables } from './template-variables.js';
 
@@ -26,7 +27,8 @@ async function cloneTemplate(mod: Mod): Promise<void> {
     for (const loader of mod.loaders) {
       const loaderPath = path.join(loadersPath, loader);
       if (await fs.access(loaderPath).then(() => true).catch(() => false)) {
-        await copyDirectoryContents(loaderPath, mod.destinationPath);
+        const loaderDestPath = path.join(mod.destinationPath, loader);
+        await copyDirectoryContents(loaderPath, loaderDestPath);
       }
     }
 
@@ -68,12 +70,14 @@ async function transformPackageStructure(mod: Mod): Promise<void> {
     }
 
     // Transform loader-specific modules (selected loaders only)
-    // Loader files are copied directly to src/main/java/ in this template structure
-    const srcPath = path.join(mod.destinationPath, 'src/main/java', templatePackagePath);
-    const srcNewPath = path.join(mod.destinationPath, 'src/main/java', userPackagePath);
+    // Each loader has its own directory at root level with src/main/java/ structure
+    for (const loader of mod.loaders) {
+      const loaderJavaPath = path.join(mod.destinationPath, loader, 'src/main/java', templatePackagePath);
+      const loaderNewJavaPath = path.join(mod.destinationPath, loader, 'src/main/java', userPackagePath);
 
-    if (await fs.access(srcPath).then(() => true).catch(() => false)) {
-      await fs.rename(srcPath, srcNewPath);
+      if (await fs.access(loaderJavaPath).then(() => true).catch(() => false)) {
+        await fs.rename(loaderJavaPath, loaderNewJavaPath);
+      }
     }
 
     s.stop('Package structure transformed');
@@ -197,7 +201,7 @@ async function generateServiceRegistrationFiles(mod: Mod): Promise<void> {
       const serviceDir = path.join(mod.destinationPath, loader, 'src/main/resources/META-INF/services');
       await fs.mkdir(serviceDir, { recursive: true });
 
-      const serviceFile = path.join(serviceDir, 'IPlatformHelper');
+      const serviceFile = path.join(serviceDir, `${variables.package_base}.platform.services.${variables.platform_helper_interface}`);
 
       // Use the correct platform helper class name for this loader
       let platformHelperClass = '';
@@ -215,6 +219,14 @@ async function generateServiceRegistrationFiles(mod: Mod): Promise<void> {
 
       const serviceContent = `${variables.package_base}.platform.services.${platformHelperClass}`;
       await fs.writeFile(serviceFile, serviceContent, 'utf-8');
+
+      // Delete the template service registration file
+      const templateServiceFile = path.join(serviceDir, `com.example.modtemplate.platform.services.${variables.platform_helper_interface}`);
+      try {
+        await fs.unlink(templateServiceFile);
+      } catch (error) {
+        // File doesn't exist, which is fine
+      }
     }
 
     s.stop('Service registration files generated');
@@ -230,13 +242,24 @@ async function renameClassFiles(mod: Mod): Promise<void> {
   try {
     const variables = await generateTemplateVariables(mod);
 
-    // Rename main class files
+    // Rename all template class files
     const classRenames = [
+      // Common module classes
       { old: 'TemplateMod.java', new: `${variables.main_class_name}.java` },
       { old: 'Constants.java', new: `${variables.constants_class_name}.java` },
+
+      // Loader entry point classes
       { old: 'TemplateFabric.java', new: `${variables.fabric_entry_class}.java` },
       { old: 'TemplateForge.java', new: `${variables.forge_entry_class}.java` },
       { old: 'TemplateNeoForge.java', new: `${variables.neoforge_entry_class}.java` },
+
+      // Fabric-specific classes
+      { old: 'TemplateDatagen.java', new: `${variables.datagen_class_name}.java` },
+
+      // Platform helper classes
+      { old: 'FabricPlatformHelper.java', new: `${variables.fabric_platform_helper}.java` },
+      { old: 'ForgePlatformHelper.java', new: `${variables.forge_platform_helper}.java` },
+      { old: 'NeoForgePlatformHelper.java', new: `${variables.neoforge_platform_helper}.java` },
     ];
 
     for (const rename of classRenames) {
@@ -279,6 +302,13 @@ async function findAndRenameClassFiles(dir: string, oldName: string, newName: st
 }
 
 async function addSampleCode(mod: Mod): Promise<void> {
+  // TODO: Implement advanced sample code system
+  // - REVISIT LATER: Requires more powerful approach than simple file copying
+  // - Support different sample types: commands, items, blocks, events, etc.
+  // - Apply template variables to sample files
+  // - Update package declarations and imports
+  // - Integrate with existing mod structure
+  // - May need code generation/AST manipulation for proper integration
   if (mod.samples.length === 0) {
     return; // Skip entirely if no samples requested
   }
@@ -295,6 +325,12 @@ async function addSampleCode(mod: Mod): Promise<void> {
 }
 
 async function installUtilityMods(mod: Mod): Promise<void> {
+  // TODO: Implement utility mod JAR installation
+  // - Download JARs from echo registry URLs
+  // - Place in appropriate directories (mods/, libs/, etc.)
+  // - Support utility mods: modmenu, jei, jade, cloth-config, etc.
+  // - Handle different loader requirements (Fabric vs Forge vs NeoForge)
+  // - Download to dev environment for testing only
   if (mod.utility.length === 0) {
     return; // Skip entirely if no utility mods requested
   }
@@ -311,6 +347,11 @@ async function installUtilityMods(mod: Mod): Promise<void> {
 }
 
 async function installLibraries(mod: Mod): Promise<void> {
+  // NOTE: Library installation is handled by Gradle during build
+  // - Dependencies added to build.gradle via template variables
+  // - Versions fetched from echo-registry and applied via templates
+  // - Gradle handles downloading and managing library dependencies
+  // - This function echoes user choices for confirmation
   if (mod.libraries.length === 0) {
     return; // Skip entirely if no libraries requested
   }
@@ -327,6 +368,12 @@ async function installLibraries(mod: Mod): Promise<void> {
 }
 
 async function configureLoaders(mod: Mod): Promise<void> {
+  // NOTE: Loader configuration is already handled through template variables
+  // - Fabric: fabric.mod.json updated via template variables
+  // - Forge: mods.toml updated via template variables
+  // - NeoForge: neoforge.mods.toml updated via template variables
+  // - Build configurations handled by gradle templates
+  // - This function echoes user choices for confirmation
   const s = spinner();
   s.start(`Configuring loaders in "${mod.destinationPath}": ${mod.loaders.join(', ')}`);
   try {
@@ -339,11 +386,47 @@ async function configureLoaders(mod: Mod): Promise<void> {
 }
 
 async function applyLicense(mod: Mod): Promise<void> {
+  // Skip if no license selected
+  if (!mod.license || mod.license === 'none') {
+    return;
+  }
+
   const s = spinner();
   s.start(`Applying license to "${mod.destinationPath}": ${mod.license}`);
+
   try {
-    await delay(300);
-    s.stop(`License applied successfully`);
+    // Map license types to template files
+    const licenseFileMap: Record<string, string> = {
+      'mit': 'mit.txt',
+      'lgpl': 'lgpl.txt',
+      'arr': 'arr.txt'
+    };
+
+    // Validate license type
+    const licenseTemplateFile = licenseFileMap[mod.license.toLowerCase()];
+    if (!licenseTemplateFile) {
+      throw new Error(`Unsupported license type: ${mod.license}. Supported types: ${Object.keys(licenseFileMap).join(', ')}`);
+    }
+
+    // Construct source and destination paths
+    const licenseTemplatePath = path.join('templates', 'license', licenseTemplateFile);
+    const licenseDestinationPath = path.join(mod.destinationPath, 'LICENSE');
+
+    // Verify template file exists
+    try {
+      await fs.access(licenseTemplatePath);
+    } catch (error) {
+      throw new Error(`License template not found: ${licenseTemplatePath}`);
+    }
+
+    // Copy license template to destination
+    await fs.copyFile(licenseTemplatePath, licenseDestinationPath);
+
+    // Apply template variables to the license file
+    const variables = await generateTemplateVariables(mod);
+    await processFile(licenseDestinationPath, variables);
+
+    s.stop(`License applied successfully: ${mod.license}`);
   } catch (error) {
     s.stop(`Failed to apply license`, 1);
     throw new Error(`License application failed in ${mod.destinationPath}: ${error instanceof Error ? error.message : String(error)}`);
@@ -351,6 +434,13 @@ async function applyLicense(mod: Mod): Promise<void> {
 }
 
 async function finalizeProject(mod: Mod): Promise<void> {
+  // TODO: Implement project finalization
+  // - Validate generated project structure
+  // - Ensure all necessary files are present
+  // - Verify template variable substitution completeness
+  // - Create any missing directories or configuration files
+  // - Generate project summary or build information
+  // - Clean up any temporary files
   const s = spinner();
   s.start(`Finalizing project structure in "${mod.destinationPath}" for "${mod.name}"...`);
   try {
@@ -363,6 +453,13 @@ async function finalizeProject(mod: Mod): Promise<void> {
 }
 
 async function runGradle(mod: Mod): Promise<void> {
+  // TODO: Implement Gradle build execution
+  // - Run 'gradle build' or './gradlew build' in project directory
+  // - Capture and display build output to user
+  // - Handle build failures and provide helpful error messages
+  // - Support different build commands (build, compileJava, etc.)
+  // - Validate generated JAR files and build artifacts
+  // - Handle Gradle wrapper permissions and setup
   const s = spinner();
   s.start(`Running Gradle build in "${mod.destinationPath}" for "${mod.name}"...`);
   try {
@@ -378,8 +475,36 @@ async function initializeGit(mod: Mod): Promise<void> {
   const s = spinner();
   s.start(`Initializing Git repository in "${mod.destinationPath}"...`);
   try {
-    await delay(300);
-    s.stop(`Git repository initialized`);
+    // Check if git is available
+    try {
+      await execa('git', ['--version'], { cwd: mod.destinationPath });
+    } catch (error) {
+      throw new Error('Git is not installed or not available in PATH');
+    }
+
+    // Initialize git repository
+    await execa('git', ['init'], { cwd: mod.destinationPath });
+
+    // Configure git user if not configured (use mod author as fallback)
+    try {
+      await execa('git', ['config', 'user.name'], { cwd: mod.destinationPath });
+    } catch (error) {
+      await execa('git', ['config', 'user.name', mod.author], { cwd: mod.destinationPath });
+    }
+
+    try {
+      await execa('git', ['config', 'user.email'], { cwd: mod.destinationPath });
+    } catch (error) {
+      await execa('git', ['config', 'user.email', `${mod.author.toLowerCase().replace(/\s+/g, '.')}@example.com`], { cwd: mod.destinationPath });
+    }
+
+    // Add all files to git
+    await execa('git', ['add', '.'], { cwd: mod.destinationPath });
+
+    // Create initial commit
+    await execa('git', ['commit', '-m', `Initial commit: ${mod.name} v${mod.version}`], { cwd: mod.destinationPath });
+
+    s.stop(`Git repository initialized with initial commit`);
   } catch (error) {
     s.stop(`Failed to initialize Git repository`, 1);
     throw new Error(`Git initialization failed in ${mod.destinationPath}: ${error instanceof Error ? error.message : String(error)}`);
@@ -387,6 +512,13 @@ async function initializeGit(mod: Mod): Promise<void> {
 }
 
 async function openInVSCode(mod: Mod): Promise<void> {
+  // TODO: Implement VS Code integration
+  // - Check if VS Code is installed and accessible
+  // - Run 'code .' command in project directory
+  // - Handle VS Code installation detection
+  // - Support alternative VS Code paths (Insiders, etc.)
+  // - Provide helpful error messages if VS Code unavailable
+  // - Consider generating VS Code workspace settings
   const s = spinner();
   s.start(`Opening project "${mod.destinationPath}" in VS Code...`);
   try {
@@ -399,6 +531,13 @@ async function openInVSCode(mod: Mod): Promise<void> {
 }
 
 async function openInIntelliJ(mod: Mod): Promise<void> {
+  // TODO: Implement IntelliJ IDEA integration
+  // - Check if IntelliJ IDEA is installed and accessible
+  // - Try different IntelliJ commands (idea, idea64, etc.)
+  // - Handle IntelliJ installation detection
+  // - Support Community and Ultimate editions
+  // - Provide helpful error messages if IntelliJ unavailable
+  // - Consider generating IntelliJ project files (.idea directory)
   const s = spinner();
   s.start(`Opening project "${mod.destinationPath}" in IntelliJ IDEA...`);
   try {

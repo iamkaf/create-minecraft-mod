@@ -1,6 +1,6 @@
-package com.example.modtemplate;
+package {{package_base}};
 
-import com.example.modtemplate.platform.Services;
+import {{package_base}}.platform.Services;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -8,10 +8,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 /**
- * Common entry point for the template mod.
+ * Common entry point for the mod.
  * Replace the contents with your own implementation.
  */
-public class TemplateMod {
+public class {{main_class_name}} {
 
     /**
      * Called during mod initialization for all loaders.

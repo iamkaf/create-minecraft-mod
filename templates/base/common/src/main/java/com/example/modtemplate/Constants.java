@@ -1,13 +1,14 @@
-package com.example.modtemplate;
+package {{package_base}};
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Constants {
+public class {{constants_class_name}} {
     /**
-     * Identifier of the mod. Update these fields when reusing the template.
+     * Mod identifier and configuration fields.
+     * Update these fields when reusing this code for other projects.
      */
-    public static final String MOD_ID = "examplemod";
-    public static final String MOD_NAME = "Example Mod";
+    public static final String MOD_ID = "{{mod_id}}";
+    public static final String MOD_NAME = "{{mod_name}}";
     public static final Logger LOG = LoggerFactory.getLogger(MOD_NAME);
 }

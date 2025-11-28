@@ -77,8 +77,10 @@ dependencies {
     // Forge's hack fix
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
 
-    // Uncomment this line if you want to use Amber
-    //implementation "com.iamkaf.amber:amber-forge:${amber_version}"
+    {{#if amber_version}}
+    // Amber
+    implementation "com.iamkaf.amber:amber-forge:${amber_version}"
+    {{/if}}
 }
 
 publishing {

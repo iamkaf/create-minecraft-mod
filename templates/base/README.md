@@ -1,8 +1,9 @@
-# {{ mod.name }}
+# {{mod_name}}
 
-This repository provides a basic template for creating Minecraft mods that target Fabric, Forge and NeoForge from the same codebase.
+{{description}}
+
+This repository provides a starting point for creating Minecraft mods that target Fabric, Forge and NeoForge from the same codebase.
 It is adapted from [jaredlll08's MultiLoader-Template](https://github.com/jaredlll08/MultiLoader-Template) and stripped down to a minimal starting point.
-The original template repository lives at [iamkaf/template-mod](https://github.com/iamkaf/template-mod).
 
 ## Directory layout
 

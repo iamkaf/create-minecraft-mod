@@ -1,21 +1,21 @@
-package com.example.modtemplate.fabric;
+package {{package_base}}.fabric;
 
-import com.example.modtemplate.fabric.datagen.*;
+import {{package_base}}.fabric.datagen.*;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 
 /**
  * Datagen entry point for Fabric.
  */
-public final class TemplateDatagen implements DataGeneratorEntrypoint {
+public final class {{datagen_class_name}} implements DataGeneratorEntrypoint {
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
         FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 
-        pack.addProvider(ModBlockTagProvider::new);
-        pack.addProvider(ModItemTagProvider::new);
-        pack.addProvider(ModBlockLootTableProvider::new);
-        pack.addProvider(ModModelProvider::new);
-        pack.addProvider(ModRecipeProvider.Runner::new);
+        pack.addProvider({{block_tag_provider_class}}::new);
+        pack.addProvider({{item_tag_provider_class}}::new);
+        pack.addProvider({{block_loot_provider_class}}::new);
+        pack.addProvider({{model_provider_class}}::new);
+        pack.addProvider({{recipe_provider_class}}.Runner::new);
     }
 }

@@ -5,8 +5,10 @@ plugins {
 }
 
 dependencies {
-    // Uncomment this line if you want to use Amber
-    //implementation "com.iamkaf.amber:amber-neoforge:${amber_version}"
+    {{#if amber_version}}
+    // Amber
+    implementation "com.iamkaf.amber:amber-neoforge:${amber_version}"
+    {{/if}}
 }
 
 neoForge {

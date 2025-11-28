@@ -1,12 +1,12 @@
-package com.example.modtemplate.platform;
+package {{package_base}}.platform;
 
-import com.example.modtemplate.platform.services.IPlatformHelper;
+import {{package_base}}.platform.services.IPlatformHelper;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
 import java.nio.file.Path;
 
-public class NeoForgePlatformHelper implements IPlatformHelper {
+public class {{neoforge_platform_helper}} implements IPlatformHelper {
 
     @Override
     public String getPlatformName() {

@@ -1,7 +1,7 @@
-package com.example.modtemplate.platform;
+package {{package_base}}.platform;
 
-import com.example.modtemplate.Constants;
-import com.example.modtemplate.platform.services.IPlatformHelper;
+import {{package_base}}.{{constants_class_name}};
+import {{package_base}}.platform.services.IPlatformHelper;
 
 import java.util.ServiceLoader;
 

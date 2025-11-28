@@ -1,5 +1,7 @@
-package com.example.modtemplate;
+package {{package_base}};
 
+import {{package_base}}.{{constants_class_name}};
+import {{package_base}}.{{main_class_name}};
 import net.minecraft.world.InteractionResult;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
@@ -10,10 +12,10 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 import static net.minecraft.world.InteractionResult.*;
 
-@Mod(Constants.MOD_ID)
-public class TemplateNeoForge {
-    public TemplateNeoForge(IEventBus eventBus) {
-        TemplateMod.init();
+@Mod({{constants_class_name}}.MOD_ID)
+public class {{neoforge_entry_class}} {
+    public {{neoforge_entry_class}}(IEventBus eventBus) {
+        {{main_class_name}}.init();
 
         NeoForge.EVENT_BUS.register(EventHandlerCommon.class);
     }
@@ -21,7 +23,7 @@ public class TemplateNeoForge {
     static class EventHandlerCommon {
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void event(PlayerInteractEvent.EntityInteract event) {
-            InteractionResult result = TemplateMod.onPlayerEntityInteract(
+            InteractionResult result = {{main_class_name}}.onPlayerEntityInteract(
                     event.getEntity(),
                     event.getLevel(),
                     event.getHand(),

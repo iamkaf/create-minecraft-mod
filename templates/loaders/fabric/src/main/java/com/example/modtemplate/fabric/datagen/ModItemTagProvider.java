@@ -1,4 +1,4 @@
-package com.example.modtemplate.fabric.datagen;
+package {{package_base}}.fabric.datagen;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
@@ -9,8 +9,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Generates item tags.
  */
-public class ModItemTagProvider extends FabricTagProvider.ItemTagProvider {
-    public ModItemTagProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
+public class {{item_tag_provider_class}} extends FabricTagProvider.ItemTagProvider {
+    public {{item_tag_provider_class}}(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
         super(output, completableFuture);
     }
 

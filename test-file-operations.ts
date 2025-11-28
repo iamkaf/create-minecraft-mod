@@ -1,4 +1,4 @@
-import { cloneTemplate, transformPackageStructure, updateJavaPackageDeclarations } from './src/core.js';
+import { cloneTemplate, transformPackageStructure, updateJavaPackageDeclarations, renameClassFiles, applyTemplateVariables, generateServiceRegistrationFiles } from './src/core.js';
 import type { Mod } from './src/types.js';
 
 const testMod: Mod = {
@@ -6,7 +6,7 @@ const testMod: Mod = {
   id: "testmod",
   package: "com.example.testmod",
   minecraftVersion: "1.21.4",
-  loaders: ["fabric"],
+  loaders: ["fabric", "forge", "neoforge"],
   libraries: ["amber"],
   utility: ["modmenu"],
   samples: ["commands"],
@@ -38,6 +38,21 @@ async function testFileOperations() {
     console.log('\n3️⃣ Testing updateJavaPackageDeclarations...');
     await updateJavaPackageDeclarations(testMod);
     console.log('✅ Java package declarations updated successfully!');
+
+    // Test class file renaming
+    console.log('\n4️⃣ Testing renameClassFiles...');
+    await renameClassFiles(testMod);
+    console.log('✅ Class files renamed successfully!');
+
+    // Test template variable application
+    console.log('\n5️⃣ Testing applyTemplateVariables...');
+    await applyTemplateVariables(testMod);
+    console.log('✅ Template variables applied successfully!');
+
+    // Test service registration file generation
+    console.log('\n6️⃣ Testing generateServiceRegistrationFiles...');
+    await generateServiceRegistrationFiles(testMod);
+    console.log('✅ Service registration files generated successfully!');
 
     console.log('\n🎉 All file operations completed successfully!');
     console.log(`📂 Check the output at: ${testMod.destinationPath}`);

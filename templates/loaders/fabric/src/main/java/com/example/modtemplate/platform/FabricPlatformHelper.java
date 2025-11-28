@@ -1,10 +1,10 @@
-package com.example.modtemplate.platform;
+package {{package_base}}.platform;
 
-import com.example.modtemplate.platform.services.IPlatformHelper;
+import {{package_base}}.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import java.nio.file.Path;
 
-public class FabricPlatformHelper implements IPlatformHelper {
+public class {{fabric_platform_helper}} implements IPlatformHelper {
 
     @Override
     public String getPlatformName() {

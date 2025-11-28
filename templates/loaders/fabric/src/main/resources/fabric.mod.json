@@ -8,18 +8,18 @@
         "${mod_author}"
     ],
     "contact": {
-        "homepage": "https://fabricmc.net/",
-        "sources": "https://github.com/FabricMC/fabric-example-mod"
+        "homepage": "https://github.com/{{mod_author}}",
+        "sources": "https://github.com/{{mod_author}}/{{mod_id}}"
     },
     "license": "${license}",
     "icon": "icon.png",
     "environment": "*",
     "entrypoints": {
         "main": [
-            "com.example.modtemplate.TemplateFabric"
+            "{{package_base}}.{{fabric_entry_class}}"
         ],
         "fabric-datagen": [
-            "com.example.modtemplate.fabric.TemplateDatagen"
+            "{{package_base}}.fabric.{{datagen_class_name}}"
         ]
     },
     "mixins": [
@@ -31,9 +31,14 @@
         "fabric-api": "*",
         "minecraft": "${fabric_version_range}",
         "java": ">=${java_version}"
+        {{#if amber_version}},
+        "amber": ">=${amber_version}"
+        {{/if}}
     },
     "suggests": {
+        {{#if mod_menu_version}}
         "modmenu": ">=${mod_menu_version}"
+        {{/if}}
     }
 }
   

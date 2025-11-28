@@ -1,4 +1,4 @@
-package com.example.modtemplate.platform.services;
+package {{package_base}}.platform.services;
 
 public interface IPlatformHelper {
 

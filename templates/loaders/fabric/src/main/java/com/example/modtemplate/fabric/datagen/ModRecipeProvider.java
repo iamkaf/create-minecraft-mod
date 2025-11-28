@@ -1,6 +1,6 @@
-package com.example.modtemplate.fabric.datagen;
+package {{package_base}}.fabric.datagen;
 
-import com.example.modtemplate.Constants;
+import {{package_base}}.{{constants_class_name}};
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.core.HolderLookup;
@@ -13,8 +13,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Generates crafting recipes.
  */
-public class ModRecipeProvider extends RecipeProvider {
-    protected ModRecipeProvider(HolderLookup.Provider provider, RecipeOutput recipeOutput) {
+public class {{recipe_provider_class}} extends RecipeProvider {
+    protected {{recipe_provider_class}}(HolderLookup.Provider provider, RecipeOutput recipeOutput) {
         super(provider, recipeOutput);
     }
 
@@ -30,12 +30,12 @@ public class ModRecipeProvider extends RecipeProvider {
 
         @Override
         protected @NotNull RecipeProvider createRecipeProvider(HolderLookup.@NotNull Provider registries, @NotNull RecipeOutput output) {
-            return new ModRecipeProvider(registries, output);
+            return new {{recipe_provider_class}}(registries, output);
         }
 
         @Override
         public @NotNull String getName() {
-            return Constants.MOD_ID + " Recipes";
+            return {{constants_class_name}}.MOD_ID + " Recipes";
         }
     }
 }

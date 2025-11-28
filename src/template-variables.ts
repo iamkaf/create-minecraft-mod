@@ -11,6 +11,7 @@ export interface TemplateVariables {
 	mod_name: string;
 	mod_id: string;
 	mod_author: string;
+	year: string;
 	description: string;
 	group: string;
 	version: string;
@@ -260,6 +261,7 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 		mod_name: mod.name,
 		mod_id: mod.id,
 		mod_author: mod.author,
+		year: new Date().getFullYear().toString(),
 		description: mod.description,
 		group: mod.package,
 		version: `${mod.version}+${minecraft_version}`,
