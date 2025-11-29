@@ -15,19 +15,19 @@ dependencies {
 
     // Runtime mods (optional, removable)
     {{#if mod_menu_version}}
-    modImplementation "maven.modrinth:modmenu:${mod_menu_version}-fabric"
+    modRuntimeOnly "maven.modrinth:modmenu:${mod_menu_version}-fabric"
     {{/if}}
     {{#if jei_version}}
-    modImplementation "maven.modrinth:jei:${jei_version}-fabric"
+    modRuntimeOnly "maven.modrinth:jei:${jei_version}-fabric"
     {{/if}}
     {{#if rei_version}}
-    modImplementation "maven.modrinth:rei:${rei_version}-fabric"
+    modRuntimeOnly "maven.modrinth:rei:${rei_version}-fabric"
     {{/if}}
     {{#if jade_version}}
-    modImplementation "maven.modrinth:jade:${jade_version}+fabric"
+    modRuntimeOnly "maven.modrinth:jade:${jade_version}+fabric"
     {{/if}}
     {{#if sodium_version}}
-    modImplementation "maven.modrinth:sodium:${sodium_version}-fabric"
+    modRuntimeOnly "maven.modrinth:sodium:${sodium_version}-fabric"
     {{/if}}
 
     // Library dependencies (become required when selected)

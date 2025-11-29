@@ -314,7 +314,7 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 
 		// Build Tool Versions
 		gradle_version: DEFAULT_VARIABLES.gradle_version!,
-		fabric_loom_version: mod.fabricLoomVersion || DEFAULT_VARIABLES.fabric_loom_version!,
+		fabric_loom_version: mod.fabricLoomVersion || findVersion("loom") || DEFAULT_VARIABLES.fabric_loom_version!,
 		moddevgradle_version: DEFAULT_VARIABLES.moddevgradle_version!,
 		modpublisher_version: DEFAULT_VARIABLES.modpublisher_version!,
 		forgegradle_version: DEFAULT_VARIABLES.forgegradle_version!,

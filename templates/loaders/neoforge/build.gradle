@@ -7,16 +7,16 @@ plugins {
 dependencies {
     // Runtime mods (optional, removable)
     {{#if jei_version}}
-    modImplementation "maven.modrinth:jei:${jei_version}-neoforge"
+    runtimeOnly "maven.modrinth:jei:${jei_version}-neoforge"
     {{/if}}
     {{#if rei_version}}
-    modImplementation "maven.modrinth:rei:${rei_version}-neoforge"
+    runtimeOnly "maven.modrinth:rei:${rei_version}-neoforge"
     {{/if}}
     {{#if jade_version}}
-    modImplementation "maven.modrinth:jade:${jade_version}+neoforge"
+    runtimeOnly "maven.modrinth:jade:${jade_version}+neoforge"
     {{/if}}
     {{#if sodium_version}}
-    modImplementation "maven.modrinth:sodium:${sodium_version}-neoforge"
+    runtimeOnly "maven.modrinth:sodium:${sodium_version}-neoforge"
     {{/if}}
 
     // Library dependencies (become required when selected)

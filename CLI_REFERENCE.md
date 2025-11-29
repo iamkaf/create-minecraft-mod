@@ -41,6 +41,8 @@ create-minecraft-mod [destination-path]
 - Libraries and utility mods
 - License and post-creation actions
 
+**Note:** Fabric Loom version is automatically fetched from Echo Registry - no manual selection needed.
+
 ## CI Mode
 
 Non-interactive mode for automation:
@@ -71,6 +73,7 @@ create-minecraft-mod ./my-mod --ci-mode --name "My Mod" --author "Me" --loaders 
 
 # Skip Gradle for faster CI
 create-minecraft-mod ./my-mod --ci-mode --name "My Mod" --author "Me" --skip-gradle
+
 ```
 
 ## Config Mode
@@ -91,7 +94,8 @@ create-minecraft-mod ./my-mod --config ./config.json
     "description": "A test mod",
     "package": "com.example.mycoolmod",
     "minecraftVersion": "1.21.10",
-    "javaVersion": "21"
+    "javaVersion": "21",
+    "fabricLoomVersion": "1.12"
   },
   "options": {
     "loaders": ["fabric", "forge"],

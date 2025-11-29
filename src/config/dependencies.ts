@@ -96,6 +96,29 @@ export const DEPENDENCIES: DependencyConfig[] = [
 
   // Libraries (Development Dependencies)
   {
+    id: 'fabric-loom',
+    displayName: 'Fabric Loom',
+    description: 'Fabric modding build tool',
+    type: 'library',
+    category: 'development',
+    registryProjectName: 'loom',
+    compatibleLoaders: ['fabric'],
+    defaultSelection: true,
+    repository: null,
+    coordinates: {
+      fabric: 'net.fabricmc:fabric-loom'
+    },
+    ui: {
+      label: '🔧 Fabric Loom',
+      description: 'Fabric modding build tool',
+      group: 'Libraries'
+    },
+    versions: {
+      templateVariable: 'fabric_loom_version',
+      versionExtraction: (data) => findVersion(data, 'loom')
+    }
+  },
+  {
     id: 'amber',
     displayName: 'Amber',
     description: 'Modding utilities and common code',

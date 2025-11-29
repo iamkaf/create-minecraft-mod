@@ -136,6 +136,43 @@ Expected: All requested libraries have version variables
 - [ ] jade_version: [value]
 - [ ] sodium_version: [value]
 
+#### Dependency Type Verification
+**Critical Check**: Verify utility mods use correct dependency types
+```bash
+# Check Fabric build.gradle for modRuntimeOnly (runtime mods)
+grep -n "modRuntimeOnly" [project-path]/fabric/build.gradle
+# Check Forge build.gradle for runtimeOnly (runtime mods)
+grep -n "runtimeOnly" [project-path]/forge/build.gradle
+# Check NeoForge build.gradle for runtimeOnly (runtime mods)
+grep -n "runtimeOnly" [project-path]/neoforge/build.gradle
+```
+
+**Expected Results:**
+- [ ] **Fabric**: Runtime mods use `modRuntimeOnly` (e.g., jei, jade, sodium, modmenu) - FABRIC LOOM DEPENDENCY TYPE
+- [ ] **Forge**: Runtime mods use `runtimeOnly` (e.g., jei, jade) - FORGE DEPENDENCY TYPE
+- [ ] **NeoForge**: Runtime mods use `runtimeOnly` (e.g., jei, jade, sodium) - NEOFORGE DEPENDENCY TYPE
+- [ ] **All Loaders**: Libraries use `implementation` (e.g., amber)
+
+**Validation Notes:**
+- ✅ **PASS**: Runtime mods use `runtimeOnly` or `modRuntimeOnly` for optional runtime dependencies
+- ❌ **FAIL**: Any runtime mod uses `implementation` or `modImplementation` instead of proper runtime dependency type
+- ❌ **FAIL**: Libraries use runtime dependency types instead of `implementation`
+
+#### Fabric Loom Version Verification
+```bash
+# Check if fabric_loom_version exists in gradle.properties
+grep -n "fabric_loom_version" [project-path]/gradle.properties
+# Check if build.gradle uses the variable
+grep -n "{{fabric_loom_version}}" [project-path]/build.gradle
+# Check actual Loom version during build
+grep -n "Fabric Loom:" [build-output]
+```
+
+**Expected Results:**
+- [ ] **gradle.properties**: `fabric_loom_version=[version]-SNAPSHOT` present
+- [ ] **build.gradle**: `{{fabric_loom_version}}` substituted correctly
+- [ ] **Build Output**: Fabric Loom version matches expected version
+
 #### Build.gradle Dependencies
 **Fabric:**
 ```bash

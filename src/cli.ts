@@ -26,7 +26,6 @@ export interface CliArgs {
   skipGit?: boolean;
   skipIde?: boolean;
   outputFormat?: 'json' | 'text';
-  fabricLoomVersion?: string;
 }
 
 function parseArguments(args: string[]): CliArgs {
@@ -138,12 +137,6 @@ function parseArguments(args: string[]): CliArgs {
           if (format === "json" || format === "text") {
             result.outputFormat = format;
           }
-          i++; // Skip next argument
-        }
-        break;
-      case "--fabric-loom-version":
-        if (nextArg && !nextArg.startsWith("-")) {
-          result.fabricLoomVersion = nextArg;
           i++; // Skip next argument
         }
         break;

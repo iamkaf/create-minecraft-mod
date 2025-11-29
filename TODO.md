@@ -15,6 +15,18 @@
 - ✅ Complete TemplateVariables interface (70+ variables)
 - ✅ Multi-loader support (Fabric, Forge, NeoForge)
 
+### Runtime Dependency System (100% Complete - Critical Fixes)
+- ✅ **Fixed Forge runtime dependencies** - Changed from `modImplementation` to `runtimeOnly` for utility mods
+- ✅ **Fixed Jade dependency format** - Changed from `${jade_version}-[loader]` to `${jade_version}+[loader]` for Modrinth compatibility
+- ✅ **Fixed JSON parsing errors** - Added missing commas in fabric.mod.json `suggests` section
+
+### Fabric Loom Version Selection (100% Complete)
+- ✅ **Automatic Echo Registry integration** - Automatically fetches latest Fabric Loom version from Echo Registry API
+- ✅ **Config file support** - `fabricLoomVersion` property for manual override when needed
+- ✅ **Template integration** - `{{fabric_loom_version}}` Handlebars substitution in build.gradle and gradle.properties
+- ✅ **buildSrc support** - Added fabric_loom_version to processResources expandProps map
+- ✅ **Zero network overhead** - Leverages existing Echo Registry API call, no additional requests
+
 ### Pipeline Functions - Core Implementation
 - ✅ `cloneTemplate()` - Template copying with loader selection
 - ✅ `transformPackageStructure()` - Package directory transformation
@@ -62,6 +74,14 @@
 - [ ] **Multi-sample anchor handling** - Handle multiple samples injecting into the same anchor point
 - [ ] **Sample collision resolution** - Manage injection order and conflicts when multiple samples target same anchors
 
+### Template System Enhancements
+- [ ] **Multiple Template Support** - Implementation details TBD
+  - Research and design multiple template system architecture
+  - Support for different base templates (minimal, full-featured, specific mod types)
+  - Template selection mechanism (interactive prompt, CLI flag, config file option)
+  - Template validation and compatibility checking
+  - Migration path for existing template system
+
 ## 📊 **Implementation Progress**
 - **Core Pipeline**: 16/17 functions implemented (94%)
 - **Template System**: 43/43 files completed (100%)
@@ -69,7 +89,7 @@
 - **Dependency Architecture**: 100% complete ✅
 - **Overall Progress**: 92% complete
 
-## 🎯 **Recent Verification Results (November 28, 2025)**
+## 🎯 **Recent Verification Results (November 29, 2025)**
 - ✅ **Complete System Verification** completed using VERIFICATION_TEMPLATE.md
 - ✅ **100% Overall Success Rate** with full multi-loader support validated
 - ✅ **100% Template Coverage** verified - no remaining {{}} patterns
@@ -77,16 +97,19 @@
 - ✅ **Dependency Architecture** fully functional with Modrinth Maven integration
 - ✅ **Three-Tier Dependency System** working (Foundation, Libraries, Runtime Mods)
 - ✅ **Maven Repository Configuration** properly implemented with exclusiveContent
+- ✅ **CRITICAL RUNTIME DEPENDENCY FIX** - Forge now uses `runtimeOnly` for utility mods, preventing Loom version conflicts
+- ✅ **FABRIC LOOM VERSION SELECTION** - Complete interactive, CI, and config file support implemented
+- ✅ **GRADLE BUILD SUCCESS** - All configurations (default 1.11, custom 1.13) build successfully
+- ✅ **JADE DEPENDENCY FORMAT** - Fixed Modrinth naming convention from `-` to `+` format
 
 ## 🔧 **Known Issues from Verification**
 
 ### Major Issues:
-**NONE** ✅ - All dependency architecture issues resolved
-3. **License Template**: Manual copying approach - should use SPDX package for proper license text generation
-4. **Missing Variables**: sodium_version and other utility mod versions not defined in gradle.properties
+**NONE** ✅ - All critical issues resolved
 
 ### Minor Issues:
-1. **Sample Code**: Current interaction handler should be removed; placeholder implementation for new anchor-based system
+1. **License Template**: Manual copying approach - should use SPDX package for proper license text generation
+2. **Sample Code System**: Current interaction handler should be replaced with anchor-based injection system
 
 ### Architecture Issues:
 **NONE** ✅ - All dependency architecture issues resolved

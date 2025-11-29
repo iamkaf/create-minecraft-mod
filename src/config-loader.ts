@@ -192,7 +192,7 @@ export function configToMod(config: ModConfigFile, destinationPath: string): Mod
     }
   }
 
-  return {
+  const result: Mod & { fabricLoomVersion?: string } = {
     name: config.mod.name,
     author: config.mod.author,
     id: config.mod.id,
@@ -207,9 +207,15 @@ export function configToMod(config: ModConfigFile, destinationPath: string): Mod
     samples: [],
     postActions,
     license: config.options.license || 'mit',
-    destinationPath,
-    fabricLoomVersion: config.mod.fabricLoomVersion
+    destinationPath
   };
+
+  // Only include fabricLoomVersion if it's defined (for exactOptionalPropertyTypes)
+  if (config.mod.fabricLoomVersion) {
+    result.fabricLoomVersion = config.mod.fabricLoomVersion;
+  }
+
+  return result;
 }
 
 /**
@@ -263,9 +269,6 @@ export function mergeConfigWithArgs(config: ModConfigFile, args: CliArgs): ModCo
   }
   if (args.javaVersion && typeof args.javaVersion === 'string') {
     merged.mod.javaVersion = args.javaVersion.trim();
-  }
-  if (args.fabricLoomVersion && typeof args.fabricLoomVersion === 'string') {
-    merged.mod.fabricLoomVersion = args.fabricLoomVersion.trim();
   }
 
   // Override options with validation
