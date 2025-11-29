@@ -119,6 +119,29 @@ export const DEPENDENCIES: DependencyConfig[] = [
     }
   },
   {
+    id: 'moddevgradle',
+    displayName: 'NeoForge ModDevGradle',
+    description: 'NeoForge modding build tool plugin',
+    type: 'library',
+    category: 'development',
+    registryProjectName: 'moddev-gradle',
+    compatibleLoaders: ['neoforge'],
+    defaultSelection: true,
+    repository: null,
+    coordinates: {
+      neoforge: 'net.neoforged:moddevgradle'
+    },
+    ui: {
+      label: '🔧 ModDevGradle',
+      description: 'NeoForge modding build tool plugin',
+      group: 'Libraries'
+    },
+    versions: {
+      templateVariable: 'moddevgradle_version',
+      versionExtraction: (data) => findVersion(data, 'moddev-gradle')
+    }
+  },
+  {
     id: 'amber',
     displayName: 'Amber',
     description: 'Modding utilities and common code',

@@ -178,9 +178,9 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 	const datagen_class_name = `${modNamePascal}Datagen`;
 
 	// Generate platform helper class names
-	const fabric_platform_helper = `${modNamePascal}PlatformHelper`;
-	const forge_platform_helper = `${modNamePascal}PlatformHelper`;
-	const neoforge_platform_helper = `${modNamePascal}PlatformHelper`;
+	const fabric_platform_helper = `FabricPlatformHelper`;
+	const forge_platform_helper = `ForgePlatformHelper`;
+	const neoforge_platform_helper = `NeoForgePlatformHelper`;
 
 	// Generate DataGen class names
 	const block_tag_provider_class = `${modNamePascal}BlockTagProvider`;
@@ -315,7 +315,7 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 		// Build Tool Versions
 		gradle_version: DEFAULT_VARIABLES.gradle_version!,
 		fabric_loom_version: mod.fabricLoomVersion || findVersion("loom") || DEFAULT_VARIABLES.fabric_loom_version!,
-		moddevgradle_version: DEFAULT_VARIABLES.moddevgradle_version!,
+		moddevgradle_version: findVersion("moddev-gradle") || DEFAULT_VARIABLES.moddevgradle_version!,
 		modpublisher_version: DEFAULT_VARIABLES.modpublisher_version!,
 		forgegradle_version: DEFAULT_VARIABLES.forgegradle_version!,
 		mixin_version: DEFAULT_VARIABLES.mixin_version!,

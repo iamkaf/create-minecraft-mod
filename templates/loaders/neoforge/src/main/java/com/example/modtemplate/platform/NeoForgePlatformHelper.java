@@ -22,8 +22,8 @@ public class {{neoforge_platform_helper}} implements IPlatformHelper {
 
     @Override
     public boolean isDevelopmentEnvironment() {
-
-        return !FMLLoader.isProduction();
+        //FMLLoader.isProduction() before 1.21.10
+        return !FMLLoader.getCurrent().isProduction();
     }
 
     @Override
