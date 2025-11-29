@@ -241,5 +241,5 @@ function generateModId(name: string): string {
     .replace(/^[^a-z]/, '') // Remove leading non-letters
     .replace(/[^a-z0-9]*$/, '') // Remove trailing non-alphanumeric
     .replace(/[^a-z0-9]/g, '') // Clean up any remaining invalid chars
-    .slice(0, 16) || 'mod'; // Limit length and provide fallback
+    || 'mod'; // Provide fallback
 }

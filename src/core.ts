@@ -255,7 +255,7 @@ async function renameClassFiles(mod: Mod): Promise<void> {
       { old: 'TemplateNeoForge.java', new: `${variables.neoforge_entry_class}.java` },
 
       // Fabric-specific classes
-      { old: 'TemplateDatagen.java', new: 'ModDatagen.java' },
+      // ModDatagen.java is already correctly named
 
       // Platform helper classes
       { old: 'FabricPlatformHelper.java', new: `${variables.fabric_platform_helper}.java` },
