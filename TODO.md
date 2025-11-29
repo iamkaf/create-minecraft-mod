@@ -121,9 +121,9 @@ Based on user feedback, the dependency system must handle 3 distinct types:
 
 ### 2. Libraries (Optional, Become Required)
 - **Description**: Optional libraries that add functionality once added
-- **Current Libraries**: Amber, Architectury API, Cloth Config, Forge Config API Port
-- **Current Status**: ⚠️ Partially implemented - only Amber properly integrated
-- **Required Changes**: Need proper Handlebars integration in all files (gradle.properties, build.gradle, loader configs)
+- **Current Libraries**: Amber
+- **Current Status**: ✅ Fully implemented and integrated
+- **Implementation**: All dependencies removed except Amber to simplify maintenance
 
 #### Library Repository Requirements:
 Libraries must use their respective development Maven repositories (NOT Modrinth Maven):
@@ -134,27 +134,11 @@ Libraries must use their respective development Maven repositories (NOT Modrinth
   - Current: `implementation "com.iamkaf.amber:amber-forge:<version>"` (Forge)
   - Current: `implementation "com.iamkaf.amber:amber-neoforge:<version>"` (NeoForge)
 
-- **Architectury API**: ❌ Not configured
-  - Repository: `https://maven.architectury.dev/`
-  - Dependencies: `modImplementation "dev.architectury:architectury-fabric:<version>"` (Fabric side)
-  - Common: `implementation "dev.architectury:architectury-common:<version>"`
-
-- **Cloth Config**: ❌ Not configured
-  - Repository: `https://maven.shedaniel.me/`
-  - Dependencies: `modApi "me.shedaniel.cloth:cloth-config-fabric:<version>"` (Fabric side)
-  - Common: `api "me.shedaniel.cloth:cloth-config-common:<version>"`
-
-- **Forge Config API Port**: ❌ Not configured (NEW LIBRARY TO ADD)
-  - Repository: `https://raw.githubusercontent.com/Fuzss/modresources/main/maven/`
-  - Dependencies: `modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:<modVersion>"` (Fabric side)
-  - Common: `api "fuzs.forgeconfigapiport:forgeconfigapiport-common-neoforgeapi:<modVersion>"`
-
 #### Library Integration Requirements:
 - Each library needs custom dependency strings per loader (Fabric/Forge/NeoForge)
 - Libraries must be added to ALL loaders including common project
 - Handlebars variables needed for: `<modVersion>`, loader-specific artifact names
 - Repository declarations must be added to settings.gradle templates
-- Dependencies require case-by-case handling due to varying patterns and artifact names
 
 ### 3. Mods (Optional, Removable)
 - **Description**: Optional utility mods for development experience (JEI, Jade, Sodium)

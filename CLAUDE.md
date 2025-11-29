@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Running the Application
 ```bash
-npm run run  # Executes via tsx: npx tsx ./src/index.ts
+npm run start  # Executes via tsx: npx tsx ./src/index.ts
 ```
 
 ### Testing
@@ -46,7 +46,7 @@ This is a Node.js CLI tool that generates Minecraft mod projects from templates.
 
 **Echo Registry Integration (`src/echo-registry.ts`)**
 - Fetches latest versions of Minecraft modding addons from official Echo Registry API
-- Supports major addons: JEI, Jade, Cloth Config, Architectury API, etc.
+- Supports major addons: JEI, Jade, Sodium, Mod Menu, etc.
 
 ### Template Processing Pipeline
 
