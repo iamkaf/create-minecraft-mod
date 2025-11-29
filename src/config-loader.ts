@@ -16,11 +16,13 @@ export interface ModConfigFile {
     package?: string;
     minecraftVersion?: string;
     javaVersion?: string;
+    fabricLoomVersion?: string;
   };
   options: {
     loaders: string[];
     libraries?: string[];
     utility?: string[];
+    mods?: string[];
     license?: string;
   };
   pipeline: {
@@ -205,7 +207,8 @@ export function configToMod(config: ModConfigFile, destinationPath: string): Mod
     samples: [],
     postActions,
     license: config.options.license || 'mit',
-    destinationPath
+    destinationPath,
+    fabricLoomVersion: config.mod.fabricLoomVersion
   };
 }
 
@@ -260,6 +263,9 @@ export function mergeConfigWithArgs(config: ModConfigFile, args: CliArgs): ModCo
   }
   if (args.javaVersion && typeof args.javaVersion === 'string') {
     merged.mod.javaVersion = args.javaVersion.trim();
+  }
+  if (args.fabricLoomVersion && typeof args.fabricLoomVersion === 'string') {
+    merged.mod.fabricLoomVersion = args.fabricLoomVersion.trim();
   }
 
   // Override options with validation

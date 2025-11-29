@@ -46,6 +46,7 @@ Options:
   --skip-git         Skip git initialization
   --skip-ide         Skip IDE opening
   --output-format    Output format (json,text)
+  --fabric-loom-version <version> Fabric Loom version (1.10,1.11,1.12,1.13)
 
 Examples:
   create-minecraft-mod ./my-mod                    # Interactive mode
@@ -327,6 +328,29 @@ if (isCancel(loaders)) {
 }
 
 mod.loaders = loaders as string[];
+
+//
+// ─── FABRIC LOOM VERSION ────────────────────────────────────────
+//
+if (mod.loaders.includes('fabric')) {
+	const fabricLoomVersion = await select({
+		message: "Fabric Loom Version",
+		options: [
+			{ value: "1.10", label: "1.10-SNAPSHOT (Stable)" },
+			{ value: "1.11", label: "1.11-SNAPSHOT (Current Default)" },
+			{ value: "1.12", label: "1.12-SNAPSHOT" },
+			{ value: "1.13", label: "1.13-SNAPSHOT (Latest)" }
+		],
+		initialValue: "1.11"
+	});
+
+	if (isCancel(fabricLoomVersion)) {
+		cancel("Operation cancelled.");
+		process.exit(0);
+	}
+
+	mod.fabricLoomVersion = `${String(fabricLoomVersion)}-SNAPSHOT`;
+}
 
 //
 // ─── LIBRARIES ────────────────────────────────────────────

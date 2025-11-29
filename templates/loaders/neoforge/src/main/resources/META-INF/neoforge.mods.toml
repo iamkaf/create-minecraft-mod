@@ -36,30 +36,6 @@ versionRange = "[${amber_version},)"
 ordering = "BEFORE"
 side = "BOTH"
 {{/if}}
-{{#if architectury_api_version}}
-[[dependencies.${mod_id}]]
-modId = "architectury"
-type="required" #mandatory (Can be one of "required", "optional", "incompatible" or "discouraged")
-versionRange = "[${architectury_api_version},)"
-ordering = "BEFORE"
-side = "BOTH"
-{{/if}}
-{{#if cloth_config_version}}
-[[dependencies.${mod_id}]]
-modId = "cloth-config"
-type="required" #mandatory (Can be one of "required", "optional", "incompatible" or "discouraged")
-versionRange = "[${cloth_config_version},)"
-ordering = "BEFORE"
-side = "BOTH"
-{{/if}}
-{{#if forge_config_api_port_version}}
-[[dependencies.${mod_id}]]
-modId = "forgeconfigapiport"
-type="required" #mandatory (Can be one of "required", "optional", "incompatible" or "discouraged")
-versionRange = "[${forge_config_api_port_version},)"
-ordering = "BEFORE"
-side = "BOTH"
-{{/if}}
 {{#if jei_version}}
 [[dependencies.${mod_id}]]
 modId = "jei"

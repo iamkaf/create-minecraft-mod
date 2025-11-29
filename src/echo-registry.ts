@@ -147,33 +147,7 @@ Sample response:
         "notes": "Failed to fetch: Error: No rei versions available",
         "fallback_used": false
       },
-      {
-        "name": "architectury-api",
-        "loader": "universal",
-        "version": "18.0.6+neoforge",
-        "mc_version": "1.21.10",
-        "source_url": "https://modrinth.com/mod/architectury-api",
-        "download_urls": {
-          "forge": null,
-          "neoforge": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/baQ6rP1K/architectury-18.0.6-neoforge.jar",
-          "fabric": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/8Ing3Dbx/architectury-18.0.6-fabric.jar"
-        },
-        "fallback_used": false
-      },
-      {
-        "name": "forge-config-api-port",
-        "loader": "universal",
-        "version": "21.10.1",
-        "mc_version": "1.21.10",
-        "source_url": "https://modrinth.com/mod/forge-config-api-port",
-        "download_urls": {
-          "forge": "https://cdn.modrinth.com/data/ohNO6lps/versions/kLEEctaG/ForgeConfigAPIPort-v21.10.1%2Bmc1.21.10-Forge.jar",
-          "neoforge": "https://cdn.modrinth.com/data/ohNO6lps/versions/bRP8ISG1/ForgeConfigAPIPort-v21.10.1%2Bmc1.21.10-NeoForge.jar",
-          "fabric": "https://cdn.modrinth.com/data/ohNO6lps/versions/IKHTwwTv/ForgeConfigAPIPort-v21.10.1%2Bmc1.21.10-Fabric.jar"
-        },
-        "fallback_used": false
-      }
-    ]
+          ]
   },
   "timestamp": "2025-11-26T23:48:11.125Z",
   "cached_at": "2025-11-26T23:48:11.125Z"

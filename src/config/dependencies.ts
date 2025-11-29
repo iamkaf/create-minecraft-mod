@@ -11,10 +11,6 @@ export interface MavenRepository {
 }
 
 export interface MavenCoordinates {
-  [loader in ModLoader]?: string;
-}
-
-export interface CommonMavenCoordinates {
   common?: string;
   fabric?: string;
   forge?: string;
@@ -31,7 +27,7 @@ export interface DependencyConfig {
   compatibleLoaders: ModLoader[];
   defaultSelection: boolean;
   repository: MavenRepository | null;
-  coordinates: CommonMavenCoordinates;
+  coordinates: MavenCoordinates;
   ui: {
     label: string;
     description?: string;
@@ -53,22 +49,7 @@ export const MAVEN_REPOSITORIES: Record<string, MavenRepository> = {
     name: 'Kaf Mod Resources',
     url: 'https://raw.githubusercontent.com/iamkaf/modresources/main/maven/'
   },
-  'architectury': {
-    id: 'architectury',
-    name: 'Architectury',
-    url: 'https://maven.architectury.dev/'
-  },
-  'cloth-config': {
-    id: 'cloth-config',
-    name: 'Cloth Config',
-    url: 'https://maven.shedaniel.me/'
-  },
-  'fuzs-mod-resources': {
-    id: 'fuzs-mod-resources',
-    name: 'Fuzs Mod Resources',
-    url: 'https://raw.githubusercontent.com/Fuzss/modresources/main/maven/'
-  },
-  'modrinth': {
+      'modrinth': {
     id: 'modrinth',
     name: 'Modrinth',
     url: 'https://api.modrinth.com/maven'
@@ -140,85 +121,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
       versionExtraction: (data) => findVersion(data, 'amber')
     }
   },
-  {
-    id: 'architectury-api',
-    displayName: 'Architectury API',
-    description: 'Multi-loader modding API',
-    type: 'library',
-    category: 'development',
-    registryProjectName: 'architectury-api',
-    compatibleLoaders: ['fabric', 'neoforge'], // Note: No Forge support for 1.20.5+
-    defaultSelection: false,
-    repository: MAVEN_REPOSITORIES['architectury'],
-    coordinates: {
-      common: 'dev.architectury:architectury-common',
-      fabric: 'dev.architectury:architectury-fabric',
-      neoforge: 'dev.architectury:architectury-neoforge'
-      // Note: forge intentionally omitted due to version limitations
-    },
-    ui: {
-      label: '🏗️ Architectury API',
-      description: 'Multi-loader modding API (NeoForge only for 1.20.5+)',
-      group: 'Libraries'
-    },
-    versions: {
-      templateVariable: 'architectury_api_version',
-      versionExtraction: (data) => findVersion(data, 'architectury-api')
-    }
-  },
-  {
-    id: 'cloth-config',
-    displayName: 'Cloth Config',
-    description: 'Configuration library for mods',
-    type: 'library',
-    category: 'development',
-    registryProjectName: 'cloth-config',
-    compatibleLoaders: ['fabric', 'forge', 'neoforge'],
-    defaultSelection: false,
-    repository: MAVEN_REPOSITORIES['cloth-config'],
-    coordinates: {
-      common: 'me.shedaniel.cloth:cloth-config-common',
-      fabric: 'me.shedaniel.cloth:cloth-config-fabric',
-      forge: 'me.shedaniel.cloth:cloth-config-forge',
-      neoforge: 'me.shedaniel.cloth:cloth-config-neoforge'
-    },
-    ui: {
-      label: '⚙️ Cloth Config',
-      description: 'Configuration library for mods',
-      group: 'Libraries'
-    },
-    versions: {
-      templateVariable: 'cloth_config_version',
-      versionExtraction: (data) => findVersion(data, 'cloth-config')
-    }
-  },
-  {
-    id: 'forge-config-api-port',
-    displayName: 'Forge Config API Port',
-    description: 'Forge Config API compatibility for other loaders',
-    type: 'library',
-    category: 'development',
-    registryProjectName: 'forge-config-api-port',
-    compatibleLoaders: ['fabric', 'neoforge'],
-    defaultSelection: false,
-    repository: MAVEN_REPOSITORIES['fuzs-mod-resources'],
-    coordinates: {
-      common: 'fuzs.forgeconfigapiport:forgeconfigapiport-common-neoforgeapi',
-      fabric: 'fuzs.forgeconfigapiport:forgeconfigapiport-fabric',
-      neoforge: 'fuzs.forgeconfigapiport:forgeconfigapiport-neoforge'
-      // Note: forge not needed since Forge has native Config API
-    },
-    ui: {
-      label: '🔌 Forge Config API Port',
-      description: 'Forge Config API compatibility for Fabric/NeoForge',
-      group: 'Libraries'
-    },
-    versions: {
-      templateVariable: 'forge_config_api_port_version',
-      versionExtraction: (data) => findVersion(data, 'forge-config-api-port')
-    }
-  },
-
+  
   // Mods (Runtime Dependencies)
   {
     id: 'modmenu',

@@ -14,4 +14,5 @@ export interface Mod {
   postActions: string[];
   license: string;
   destinationPath: string;
+  fabricLoomVersion?: string;
 }

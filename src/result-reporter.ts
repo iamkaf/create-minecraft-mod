@@ -79,7 +79,7 @@ export class ResultReporter {
       options: {
         loaders: this.mod.loaders,
         libraries: this.mod.libraries,
-        mods: this.mod.mods,
+        utility: this.mod.mods,
         license: this.mod.license,
         postActions: this.mod.postActions
       },

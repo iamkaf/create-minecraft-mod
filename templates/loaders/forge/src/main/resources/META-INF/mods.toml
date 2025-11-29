@@ -33,14 +33,6 @@ versionRange = "[${amber_version},)"
 ordering = "BEFORE"
 side = "BOTH"
 {{/if}}
-{{#if cloth_config_version}}
-[[dependencies.${mod_id}]]
-modId = "cloth-config"
-mandatory = true
-versionRange = "[${cloth_config_version},)"
-ordering = "BEFORE"
-side = "BOTH"
-{{/if}}
 {{#if jei_version}}
 [[dependencies.${mod_id}]]
 modId = "jei"

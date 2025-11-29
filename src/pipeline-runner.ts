@@ -227,7 +227,8 @@ export function createModFromArgs(args: any, destinationPath: string): Mod {
     samples: [],
     postActions: ['git-init', 'run-gradle'],
     license: args.license || 'mit',
-    destinationPath
+    destinationPath,
+    fabricLoomVersion: args.fabricLoomVersion ? `${args.fabricLoomVersion}`.endsWith('-SNAPSHOT') ? args.fabricLoomVersion : `${args.fabricLoomVersion}-SNAPSHOT` : undefined
   };
 }
 

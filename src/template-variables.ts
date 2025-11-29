@@ -48,14 +48,11 @@ export interface TemplateVariables {
 	parchment_version: string;
 	mod_menu_version: string;
 	amber_version: string | undefined; // Optional
-	cloth_config_version: string | undefined; // Optional
-	architectury_api_version: string | undefined; // Optional
-	jei_version: string | undefined; // Optional
+		jei_version: string | undefined; // Optional
 	rei_version: string | undefined; // Optional
 	jade_version: string | undefined; // Optional
 	sodium_version: string | undefined; // Optional
-	forge_config_api_port_version: string | undefined; // Optional
-
+	
 	// Publishing/Release Variables
 	curse_id: string;
 	modrinth_id: string;
@@ -270,9 +267,6 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 	};
 
 	const amber_version = extractLibraryVersion("amber", "amber");
-	const cloth_config_version = extractLibraryVersion("cloth-config", "cloth-config");
-	const architectury_api_version = extractLibraryVersion("architectury", "architectury-api");
-	const forge_config_api_port_version = extractLibraryVersion("forge-config-api-port", "forge-config-api-port");
 
 	// Calculate version ranges
 	const calculateMinecraftRange = (version: string): string => {
@@ -320,7 +314,7 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 
 		// Build Tool Versions
 		gradle_version: DEFAULT_VARIABLES.gradle_version!,
-		fabric_loom_version: DEFAULT_VARIABLES.fabric_loom_version!,
+		fabric_loom_version: mod.fabricLoomVersion || DEFAULT_VARIABLES.fabric_loom_version!,
 		moddevgradle_version: DEFAULT_VARIABLES.moddevgradle_version!,
 		modpublisher_version: DEFAULT_VARIABLES.modpublisher_version!,
 		forgegradle_version: DEFAULT_VARIABLES.forgegradle_version!,
@@ -346,13 +340,10 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 		parchment_version: parchment_version || "",
 		mod_menu_version: mod_menu_version || "",
 		amber_version,
-		cloth_config_version,
-		architectury_api_version,
 		jei_version,
 		rei_version,
 		jade_version,
 		sodium_version,
-		forge_config_api_port_version,
 
 		// Publishing/Release Variables
 		curse_id: DEFAULT_VARIABLES.curse_id!,

@@ -79,13 +79,13 @@ dependencies {
 
     // Runtime mods (optional, removable)
     {{#if jei_version}}
-    modImplementation "maven.modrinth:jei:${jei_version}-forge"
+    runtimeOnly "maven.modrinth:jei:${jei_version}-forge"
     {{/if}}
     {{#if rei_version}}
-    modImplementation "maven.modrinth:rei:${rei_version}-forge"
+    runtimeOnly "maven.modrinth:rei:${rei_version}-forge"
     {{/if}}
     {{#if jade_version}}
-    modImplementation "maven.modrinth:jade:${jade_version}-forge"
+    runtimeOnly "maven.modrinth:jade:${jade_version}+forge"
     {{/if}}
     // Note: Sodium not available for Forge (use different implementations)
 
@@ -93,12 +93,7 @@ dependencies {
     {{#if amber_version}}
     implementation "com.iamkaf.amber:amber-forge:${amber_version}"
     {{/if}}
-    // Note: Architectury API not available for Forge 1.20.5+ (use NeoForge instead)
-    {{#if cloth_config_version}}
-    modApi "me.shedaniel.cloth:cloth-config-forge:${cloth_config_version}"
-    {{/if}}
-    // Note: Forge Config API Port not needed for Forge (has native Config API)
-}
+    }
 
 publishing {
     publications {
