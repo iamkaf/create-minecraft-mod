@@ -13,8 +13,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Generates crafting recipes.
  */
-public class {{recipe_provider_class}} extends RecipeProvider {
-    protected {{recipe_provider_class}}(HolderLookup.Provider provider, RecipeOutput recipeOutput) {
+public class ModRecipeProvider extends RecipeProvider {
+    protected ModRecipeProvider(HolderLookup.Provider provider, RecipeOutput recipeOutput) {
         super(provider, recipeOutput);
     }
 

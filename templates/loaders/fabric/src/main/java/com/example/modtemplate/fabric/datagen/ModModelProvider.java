@@ -8,8 +8,8 @@ import net.minecraft.client.data.models.ItemModelGenerators;
 /**
  * Generates models for blocks and items.
  */
-public class {{model_provider_class}} extends FabricModelProvider {
-    public {{model_provider_class}}(FabricDataOutput output) {
+public class ModModelProvider extends FabricModelProvider {
+    public ModModelProvider(FabricDataOutput output) {
         super(output);
     }
 

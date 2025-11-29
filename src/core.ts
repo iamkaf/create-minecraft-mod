@@ -255,12 +255,7 @@ async function renameClassFiles(mod: Mod): Promise<void> {
       { old: 'TemplateNeoForge.java', new: `${variables.neoforge_entry_class}.java` },
 
       // Fabric-specific classes
-      { old: 'TemplateDatagen.java', new: `${variables.datagen_class_name}.java` },
-      { old: 'ModRecipeProvider.java', new: `${variables.recipe_provider_class}.java` },
-      { old: 'ModBlockTagProvider.java', new: `${variables.block_tag_provider_class}.java` },
-      { old: 'ModItemTagProvider.java', new: `${variables.item_tag_provider_class}.java` },
-      { old: 'ModBlockLootTableProvider.java', new: `${variables.block_loot_provider_class}.java` },
-      { old: 'ModModelProvider.java', new: `${variables.model_provider_class}.java` },
+      { old: 'TemplateDatagen.java', new: 'ModDatagen.java' },
 
       // Platform helper classes
       { old: 'FabricPlatformHelper.java', new: `${variables.fabric_platform_helper}.java` },

@@ -175,7 +175,7 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 	const fabric_entry_class = `${modNamePascal}Fabric`;
 	const forge_entry_class = `${modNamePascal}Forge`;
 	const neoforge_entry_class = `${modNamePascal}NeoForge`;
-	const datagen_class_name = `${modNamePascal}Datagen`;
+	const datagen_class_name = `ModDatagen`;
 
 	// Generate platform helper class names
 	const fabric_platform_helper = `FabricPlatformHelper`;
@@ -183,11 +183,11 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 	const neoforge_platform_helper = `NeoForgePlatformHelper`;
 
 	// Generate DataGen class names
-	const block_tag_provider_class = `${modNamePascal}BlockTagProvider`;
-	const item_tag_provider_class = `${modNamePascal}ItemTagProvider`;
-	const block_loot_provider_class = `${modNamePascal}BlockLootTableProvider`;
-	const model_provider_class = `${modNamePascal}ModelProvider`;
-	const recipe_provider_class = `${modNamePascal}RecipeProvider`;
+	const block_tag_provider_class = `ModBlockTagProvider`;
+	const item_tag_provider_class = `ModItemTagProvider`;
+	const block_loot_provider_class = `ModBlockLootTableProvider`;
+	const model_provider_class = `ModModelProvider`;
+	const recipe_provider_class = `ModRecipeProvider`;
 
 	// Generate mixin variables
 	const mixin_package = `${mod.package}.mixin`;

@@ -9,8 +9,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Generates block loot tables.
  */
-public class {{block_loot_provider_class}} extends FabricBlockLootTableProvider {
-    public {{block_loot_provider_class}}(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
+public class ModBlockLootTableProvider extends FabricBlockLootTableProvider {
+    public ModBlockLootTableProvider(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
         super(dataOutput, registryLookup);
     }
 
