@@ -17,6 +17,13 @@ pluginManagement {
         // Mod Publisher
         maven { url "https://maven.firstdark.dev/releases" }
     }
+    plugins {
+        id 'fabric-loom' version "${fabric_loom_version}"
+        id 'net.neoforged.moddev' version "${moddevgradle_version}"
+        id 'net.minecraftforge.gradle' version "${forgegradle_version}"
+        id 'org.spongepowered.mixin' version "${mixin_version}"
+        id "com.hypherionmc.modutils.modpublisher" version "${modpublisher_version}"
+    }
 }
 
 plugins {

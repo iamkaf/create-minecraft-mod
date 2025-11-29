@@ -1,7 +1,7 @@
 plugins {
     id 'multiloader-loader'
-    id 'net.minecraftforge.gradle' version '[6.0.24,6.2)'
-    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
+    id 'net.minecraftforge.gradle'
+    id 'org.spongepowered.mixin'
     id 'com.hypherionmc.modutils.modpublisher'
 }
 
@@ -87,7 +87,6 @@ dependencies {
     {{#if jade_version}}
     runtimeOnly "maven.modrinth:jade:${jade_version}+forge"
     {{/if}}
-    // Note: Sodium not available for Forge (use different implementations)
 
     // Library dependencies (become required when selected)
     {{#if amber_version}}

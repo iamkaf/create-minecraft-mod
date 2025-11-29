@@ -3,9 +3,6 @@ plugins {
     id 'maven-publish'
 }
 
-// Default Fabric Loom version if not specified
-def DEFAULT_FABRIC_LOOM_VERSION = '1.11-SNAPSHOT'
-
 base {
     archivesName = "${mod_id}-${project.name}"
 }
@@ -115,7 +112,7 @@ processResources {
             'fabric_version_range'         : fabric_version_range,
             'fabric_version'               : fabric_version,
             'fabric_loader_version'        : fabric_loader_version,
-            'fabric_loom_version'          : project.hasProperty('fabric_loom_version') ? fabric_loom_version : DEFAULT_FABRIC_LOOM_VERSION,
+            'fabric_loom_version'          : fabric_loom_version,
             'mod_name'                     : mod_name,
             'mod_author'                   : mod_author,
             'mod_id'                       : mod_id,
