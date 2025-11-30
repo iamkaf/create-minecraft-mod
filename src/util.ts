@@ -63,6 +63,22 @@ export function formatPackageName(input: string) {
 	return segments.join(".");
 }
 
+export function createSmartPackageDefault(authorName: string, modName: string): string {
+	// Format author name
+	const formattedAuthor = authorName
+		.normalize("NFD").replace(/[\u0300-\u036f]/g, "") // strip accents
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "") // remove all non-alphanumeric
+		.replace(/^[^a-z]/g, '') // remove leading non-letters
+		.trim();
+
+	// Format mod name using existing function
+	const formattedMod = formatPackageName(modName);
+
+	// Build package name: com.author.modname
+	return formattedAuthor ? `com.${formattedAuthor}.${formattedMod}` : `com.example.${formattedMod}`;
+}
+
 export function validateDestinationPath(path: string): { valid: boolean; error?: string } {
 	try {
 		const resolvedPath = resolve(path);

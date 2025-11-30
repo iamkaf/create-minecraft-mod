@@ -10,7 +10,7 @@
 
 ## 🎯 Remaining Tasks
 
-### High Priority
+### Medium Priority
 
 #### 1. Project Finalization (`finalizeProject()`)
 **Status**: Placeholder function
@@ -65,9 +65,27 @@
 
 ---
 
+### High Priority
+
+#### 3. Dependency Classification System (Critical)
+**Status**: Core build dependencies incorrectly shown as optional libraries
+**Description**: Fix fundamental misunderstanding in dependency classification that confuses users about what's optional vs required.
+
+**Root Cause**: Build tools and core dependencies (Fabric API, Fabric Loom, ModDevGradle) are presented as user-selectable options when they should be automatically managed by the build system.
+
+**Fix Required**:
+- Redesign dependency classification UI/UX to separate core/build from optional libraries
+- Update three-tier dependency architecture implementation
+- Fix library presentation logic in interactive prompts
+- Remove core build dependencies from user selection
+
+**Impact**: Major UX improvement, removes confusion about required vs optional components
+
+---
+
 ### Medium Priority
 
-#### 3. License Enhancement (SPDX Integration)
+#### 4. License Enhancement (SPDX Integration)
 **Status**: Manual file copying
 **Description**: Replace manual license template copying with SPDX package integration.
 
@@ -86,7 +104,7 @@
 
 ---
 
-#### 4. Multiple Template Support
+#### 5. Multiple Template Support
 **Status**: Single template system
 **Description**: Support multiple base templates for different use cases.
 
@@ -109,15 +127,16 @@
 
 ## 📋 Implementation Order
 
-### Phase 1: Core Cleanup (Week 1)
-1. **Project Finalization** - Complete `finalizeProject()` function
-2. **License Enhancement** - SPDX integration
+### Phase 1: Core Architecture (Week 1)
+1. **Dependency Classification System** - Fix core vs library presentation (Critical)
+2. **Project Finalization** - Complete `finalizeProject()` function
 
 ### Phase 2: Advanced Features (Week 2-3)
 3. **Sample Code System** - Complete anchor-based injection architecture
+4. **License Enhancement** - SPDX integration
 
 ### Phase 3: Extensibility (Week 4)
-4. **Multiple Templates** - Template selection and management system
+5. **Multiple Templates** - Template selection and management system
 
 ---
 
@@ -130,6 +149,11 @@
 - **Dependency Architecture**: Three-tier system working perfectly
 - **Echo Registry Integration**: Full API integration with compatibility support
 - **Maven Repository Management**: Proper exclusiveContent configuration
+- **Package Transformation Bug**: Fixed interactive mode using robust pipeline implementation
+- **VS Code Hanging Issue**: Fixed execa calls to use `.unref()` for proper background execution
+- **Smart Package Defaults**: Implemented `com.author.modname` automatic package naming
+- **Optional Sample Code**: Added "None" option to allow starting with empty project
+- **Misleading Compatibility Warnings**: Fixed warning logic to only show true incompatibilities
 
 ### Future Considerations
 - **Test Framework**: Implement comprehensive testing suite (see Testing Strategy section)

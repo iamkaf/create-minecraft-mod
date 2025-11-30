@@ -14,9 +14,9 @@ import { validateModConfiguration, logWarnings } from "./warnings.js";
 import { inspect } from "util";
 import { resolve } from "node:path";
 import { parseArguments, type CliArgs, CLIMode } from "./cli.js";
-import { formatModId, formatPackageName, validateDestinationPath } from "./util.js";
+import { formatModId, formatPackageName, createSmartPackageDefault, validateDestinationPath } from "./util.js";
 import type { Mod } from "./types.js";
-import { runPipeline } from "./core.js";
+import { runPipeline } from './pipeline-runner.js';
 import { handleHeadlessMode } from "./headless-mode.js";
 import { handleConfigMode } from "./config-mode.js";
 
@@ -261,8 +261,8 @@ mod.id = String(modId);
 //
 const modPackage = await text({
 	message: "Java Package",
-	placeholder: formatPackageName(mod.name),
-	initialValue: formatPackageName(mod.name),
+	placeholder: createSmartPackageDefault(mod.author, mod.name),
+	initialValue: createSmartPackageDefault(mod.author, mod.name),
 	validate(value) {
 		const pkg = value.trim();
 
@@ -411,6 +411,7 @@ mod.mods = utilityMods as string[];
 const samples = await multiselect({
 	message: "Include Sample Code?",
 	options: [
+		{ value: "none", label: "None - Start with empty project" },
 		{ value: "item-registration", label: "Item Registration" },
 		{ value: "datagen", label: "Data Generation" },
 		{ value: "commands", label: "Commands" },
@@ -423,7 +424,8 @@ if (isCancel(samples)) {
 	process.exit(0);
 }
 
-mod.samples = samples as string[];
+// Filter out "none" option - users can now start with empty project
+mod.samples = (samples as string[]).filter(sample => sample !== "none");
 
 //
 // ─── LICENSE ──────────────────────────────────────────────

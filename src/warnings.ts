@@ -43,17 +43,9 @@ export function validateDependencyCompatibility(mod: Mod): ValidationResult {
         suggestion: `Add a compatible loader: ${config.compatibleLoaders.join(', ')}`,
         preventGeneration: true
       });
-    } else if (compatibleLoaders.length < mod.loaders.length) {
-      const incompatibleLoaders = mod.loaders.filter(loader =>
-        !config.compatibleLoaders.includes(loader as any)
-      );
-      warnings.push({
-        type: 'warning',
-        category: 'loader-compatibility',
-        message: `${config.displayName} will only work with: ${compatibleLoaders.join(', ')}`,
-        suggestion: `Remove incompatible loaders: ${incompatibleLoaders.join(', ')}`
-      });
     }
+    // No compatibility warnings needed - as long as there's at least one compatible loader,
+    // the conditional template logic will handle it correctly
   }
 
   return {

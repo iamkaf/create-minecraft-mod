@@ -112,16 +112,47 @@ export async function transformPackageStructure(mod: Mod): Promise<void> {
       const templatePackageDir = path.join(mod.destinationPath, subproject, 'src', 'main', 'java', templatePackagePath);
       const targetPackageDir = path.join(mod.destinationPath, subproject, 'src', 'main', 'java', targetPackagePath);
 
-      if (await fs.access(templatePackageDir).then(() => true).catch(() => false)) {
-        // Create target parent directories
-        const targetParentDir = path.dirname(targetPackageDir);
-        await fs.mkdir(targetParentDir, { recursive: true });
+      console.log(`🔍 ${subproject}: Processing transformation`);
+      console.log(`   Source: ${templatePackageDir}`);
+      console.log(`   Target: ${targetPackageDir}`);
 
-        // Move the package directory
+      // Check if source directory exists
+      const sourceExists = await fs.access(templatePackageDir).then(() => true).catch(() => false);
+      if (!sourceExists) {
+        console.log(`⚠️  ${subproject}: Template package directory not found at ${templatePackageDir}`);
+        continue;
+      }
+
+      // Check if target directory already exists
+      const targetExists = await fs.access(targetPackageDir).then(() => true).catch(() => false);
+      if (targetExists) {
+        console.log(`⚠️  ${subproject}: Target package directory already exists at ${targetPackageDir}, skipping...`);
+        continue;
+      }
+
+      // Create target parent directories (but not the final directory itself)
+      const targetParentDir = path.dirname(targetPackageDir);
+      await fs.mkdir(targetParentDir, { recursive: true });
+
+      // Try to move the package directory, with fallback to copy+delete
+      try {
         await fs.rename(templatePackageDir, targetPackageDir);
         console.log(`✅ Moved ${subproject}: ${templatePackagePath} → ${targetPackagePath}`);
-      } else {
-        console.log(`⚠️  ${subproject}: Template package directory not found at ${templatePackageDir}`);
+      } catch (renameError) {
+        console.log(`⚠️  Rename failed, using copy+delete fallback for ${subproject}`);
+        console.log(`   Error: ${renameError instanceof Error ? renameError.message : String(renameError)}`);
+        console.log(`   Source: ${templatePackageDir}`);
+        console.log(`   Target: ${targetPackageDir}`);
+
+        // Fallback: copy recursively then delete original
+        try {
+          await fs.cp(templatePackageDir, targetPackageDir, { recursive: true });
+          await fs.rm(templatePackageDir, { recursive: true });
+          console.log(`✅ Copied ${subproject}: ${templatePackagePath} → ${targetPackagePath}`);
+        } catch (copyError) {
+          console.log(`❌ Copy operation also failed for ${subproject}`);
+          throw new Error(`Failed to transform package directory for ${subproject}: ${copyError instanceof Error ? copyError.message : String(copyError)}`);
+        }
       }
 
       // Clean up empty directories for each subproject
@@ -677,7 +708,7 @@ export async function openInVSCode(mod: Mod): Promise<void> {
   s.start(`Opening ${mod.destinationPath} in VS Code...`);
   try {
     const { execa } = await import('execa');
-    await execa('code', [mod.destinationPath], { cwd: mod.destinationPath, detached: true });
+    execa('code', [mod.destinationPath], { cwd: mod.destinationPath, detached: true }).unref();
     s.stop(`Opened ${mod.destinationPath} in VS Code`);
   } catch (error) {
     s.stop(`Failed to open VS Code`, 1);
@@ -690,7 +721,7 @@ export async function openInIntelliJ(mod: Mod): Promise<void> {
   s.start(`Opening ${mod.destinationPath} in IntelliJ IDEA...`);
   try {
     const { execa } = await import('execa');
-    await execa('idea', [mod.destinationPath], { cwd: mod.destinationPath, detached: true });
+    execa('idea', [mod.destinationPath], { cwd: mod.destinationPath, detached: true }).unref();
     s.stop(`Opened ${mod.destinationPath} in IntelliJ IDEA`);
   } catch (error) {
     s.stop(`Failed to open IntelliJ IDEA`, 1);
