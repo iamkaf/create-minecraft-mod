@@ -609,6 +609,7 @@ export async function runGradle(mod: Mod): Promise<void> {
 }
 
 function shouldShowOutput(output: string): boolean {
+  return true;
   // Show key Gradle operations but filter verbose noise
   const keyPatterns = [
     /Downloading/i,

@@ -36,38 +36,6 @@ versionRange = "[${amber_version},)"
 ordering = "BEFORE"
 side = "BOTH"
 {{/if}}
-{{#if jei_version}}
-[[dependencies.${mod_id}]]
-modId = "jei"
-type="optional" #mandatory (Can be one of "required", "optional", "incompatible" or "discouraged")
-versionRange = "[${jei_version},)"
-ordering = "AFTER"
-side = "BOTH"
-{{/if}}
-{{#if jade_version}}
-[[dependencies.${mod_id}]]
-modId = "jade"
-type="optional" #mandatory (Can be one of "required", "optional", "incompatible" or "discouraged")
-versionRange = "[${jade_version},)"
-ordering = "AFTER"
-side = "BOTH"
-{{/if}}
-{{#if mod_menu_version}}
-[[dependencies.${mod_id}]]
-modId = "modmenu"
-type="optional" #mandatory (Can be one of "required", "optional", "incompatible" or "discouraged")
-versionRange = "[${mod_menu_version},)"
-ordering = "AFTER"
-side = "CLIENT"
-{{/if}}
-{{#if sodium_version}}
-[[dependencies.${mod_id}]]
-modId = "sodium"
-type="optional" #mandatory (Can be one of "required", "optional", "incompatible" or "discouraged")
-versionRange = "[${sodium_version},)"
-ordering = "AFTER"
-side = "CLIENT"
-{{/if}}
 
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't

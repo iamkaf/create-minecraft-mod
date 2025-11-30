@@ -126,13 +126,15 @@ processResources {
             'java_version'                 : java_version
     ]
 
-    // Handle optional library and utility mod versions
-    ['amber_version', 'mod_menu_version',
-     'jei_version', 'rei_version', 'jade_version', 'sodium_version',
-     'fabric_loom_version'].each { propName ->
-        if (project.hasProperty(propName)) {
-            expandProps[propName] = project[propName]
-        }
+    // Handle optional library and utility mod versions dynamically
+    // Only process properties that actually exist in the project
+    project.properties.findAll { key, value ->
+        // Include optional dependency version properties that exist
+        key.matches('.*_version$') &&
+        (key.contains('_version_fabric') || key.contains('_version_forge') || key.contains('_version_neoforge') ||
+         key in ['amber_version'])
+    }.each { propName, propValue ->
+        expandProps[propName] = propValue
     }
 
     var jsonExpandProps = expandProps.collectEntries {

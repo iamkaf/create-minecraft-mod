@@ -69,7 +69,7 @@
 
 ### Advanced Features
 - [ ] `addSampleCode()` - Anchor-based sample code injection system with metadata.json
-- [ ] **Remove existing sample code** - Remove current interaction handler from VerificationTestModMod.java
+- ✅ **Remove existing sample code** - Removed current interaction handler from loader entry classes
 - [ ] **Sample code metadata system** - Support Copy and Inject modes for sample insertion
 - [ ] **Multi-sample anchor handling** - Handle multiple samples injecting into the same anchor point
 - [ ] **Sample collision resolution** - Manage injection order and conflicts when multiple samples target same anchors

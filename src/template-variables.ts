@@ -62,6 +62,14 @@ export interface TemplateVariables {
 	sodium_version_fabric?: string;
 	sodium_version_forge?: string;
 	sodium_version_neoforge?: string;
+
+	rei_version_fabric?: string;
+	rei_version_forge?: string;
+	rei_version_neoforge?: string;
+
+	mod_menu_version_fabric?: string;
+	mod_menu_version_forge?: string;
+	mod_menu_version_neoforge?: string;
 	
 	// Publishing/Release Variables
 	curse_id: string;
@@ -225,11 +233,15 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 	const mixin_refmap_name = `${mod.id}.refmap.json`;
 	const java_compatibility_level = `JAVA_${mod.javaVersion}`;
 
-	// Try to fetch compatibility information from Echo Registry
+	// Get project names for requested mods only
+	const requestedModProjects = mod.mods
+		.map(modId => getDependencyConfig(modId)?.registryProjectName)
+		.filter((name): name is string => name !== undefined);
+
+	// Try to fetch compatibility information from Echo Registry for requested mods only
 	let compatibilityData = {} as CompatibilityResponse['data'];
 	try {
-		const allProjects = getDependencyProjectNames();
-		const compatibilityResponse = await fetchCompatibilityVersions(mod.minecraftVersion, allProjects);
+		const compatibilityResponse = await fetchCompatibilityVersions(mod.minecraftVersion, requestedModProjects);
 		compatibilityData = compatibilityResponse.data;
 	} catch (error) {
 		console.warn(`Failed to fetch compatibility data: ${error}`);
@@ -301,17 +313,24 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 		return extractCleanVersion(dependency.coordinates);
 	};
 
-	// Extract loader-specific versions using compatibility API (for Modrinth mods only)
-	const jeiLoaderData = extractLoaderVersions(compatibilityData, "jei", mod.minecraftVersion);
-	const jadeLoaderData = extractLoaderVersions(compatibilityData, "jade", mod.minecraftVersion);
-	const sodiumLoaderData = extractLoaderVersions(compatibilityData, "sodium", mod.minecraftVersion);
+	// Extract loader-specific versions for requested mods using compatibility API
+	const getLoaderVersions = (modId: string, registryProjectName: string) => {
+		if (!mod.mods.includes(modId)) return {};
+		return extractLoaderVersions(compatibilityData, registryProjectName, mod.minecraftVersion);
+	};
+
+	const jeiLoaderData = getLoaderVersions("jei", "jei");
+	const jadeLoaderData = getLoaderVersions("jade", "jade");
+	const sodiumLoaderData = getLoaderVersions("sodium", "sodium");
+	const reiLoaderData = getLoaderVersions("rei", "rei");
+	const modmenuLoaderData = getLoaderVersions("modmenu", "modmenu");
 
 	// Amber uses its own repository, not Modrinth - use legacy system
 	const amber_version = extractLibraryVersion("amber", "amber");
 
-	// For modmenu, fall back to legacy system for now
-	const mod_menu_version = extractModVersion("modmenu", "modmenu");
-	const rei_version = extractModVersion("rei", "rei");
+	// Use compatibility API for all runtime mods (REI and Mod Menu now consistent)
+	const mod_menu_version = modmenuLoaderData.fabric_version || undefined;
+	const rei_version = reiLoaderData.fabric_version || undefined;
 
 	// Calculate version ranges
 	const calculateMinecraftRange = (version: string): string => {
@@ -336,10 +355,36 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 		return match ? `[${match[1]},)` : "[4,)";
 	};
 
-	// Generate dependency strings
-	const hasAmber = mod.libraries.includes("amber");
-	const mod_modrinth_depends = hasAmber ? "amber" : "";
-	const mod_curse_depends = hasAmber ? "amber-lib" : "";
+	// Generate dependency strings for all selected libraries
+	const generateLibraryDependencies = (libraries: string[]) => {
+		if (libraries.length === 0) {
+			return { modrinth: '""', curse: '""' };
+		}
+
+		const modrinthDeps: string[] = [];
+		const curseDeps: string[] = [];
+
+		for (const libId of libraries) {
+			const config = getDependencyConfig(libId);
+			if (config) {
+				// Add Modrinth dependency ID
+				modrinthDeps.push(libId);
+
+				// Add Curse dependency ID (typically libId + "-lib" pattern)
+				// Can be customized per library if needed in the future
+				curseDeps.push(`${libId}-lib`);
+			}
+		}
+
+		return {
+			modrinth: modrinthDeps.join(","),
+			curse: curseDeps.join(",")
+		};
+	};
+
+	const libraryDeps = generateLibraryDependencies(mod.libraries);
+	const mod_modrinth_depends = libraryDeps.modrinth;
+	const mod_curse_depends = libraryDeps.curse;
 
 	// Generate dynamic GitHub URLs using configuration-driven URL builders
 	// This replaces hardcoded placeholder URLs with patterns based on mod information
@@ -400,6 +445,14 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 		sodium_version_fabric: sodiumLoaderData.fabric_version || undefined,
 		sodium_version_forge: sodiumLoaderData.forge_version || undefined,
 		sodium_version_neoforge: sodiumLoaderData.neoforge_version || undefined,
+
+		rei_version_fabric: reiLoaderData.fabric_version || undefined,
+		rei_version_forge: reiLoaderData.forge_version || undefined,
+		rei_version_neoforge: reiLoaderData.neoforge_version || undefined,
+
+		mod_menu_version_fabric: modmenuLoaderData.fabric_version || undefined,
+		mod_menu_version_forge: modmenuLoaderData.forge_version || undefined,
+		mod_menu_version_neoforge: modmenuLoaderData.neoforge_version || undefined,
 
 		// Publishing/Release Variables
 		curse_id: DEFAULT_VARIABLES.curse_id!,

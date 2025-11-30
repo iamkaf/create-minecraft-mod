@@ -34,20 +34,6 @@
         {{#if amber_version}},
         "amber": ">=${amber_version}"
         {{/if}}
-    },
-    "suggests": {
-        {{#if mod_menu_version}}
-        "modmenu": ">=${mod_menu_version}",
-        {{/if}}
-        {{#if jei_version}}
-        "jei": ">=${jei_version}",
-        {{/if}}
-        {{#if jade_version}}
-        "jade": ">=${jade_version}",
-        {{/if}}
-        {{#if sodium_version}}
-        "sodium": ">=${sodium_version}"
-        {{/if}}
     }
 }
   

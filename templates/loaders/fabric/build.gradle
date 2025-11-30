@@ -14,8 +14,9 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
     // Runtime mods (optional, removable)
-    if (project.hasProperty('mod_menu_version')) {
-        modRuntimeOnly "maven.modrinth:modmenu:${mod_menu_version}-fabric"
+    // Mod Menu - include if supported with Fabric version
+    if (project.hasProperty('mod_menu_version_fabric') && mod_menu_version_fabric != "NOT_AVAILABLE") {
+        modRuntimeOnly "maven.modrinth:modmenu:${mod_menu_version_fabric}"
     }
 
     // JEI - include if supported with Fabric version
@@ -23,8 +24,9 @@ dependencies {
         modRuntimeOnly "maven.modrinth:jei:${jei_version_fabric}"
     }
 
-    if (project.hasProperty('rei_version') && rei_version != "NOT_AVAILABLE") {
-        modRuntimeOnly "maven.modrinth:rei:${rei_version}-fabric"
+    // REI - include if supported with Fabric version
+    if (project.hasProperty('rei_version_fabric') && rei_version_fabric != "NOT_AVAILABLE") {
+        modRuntimeOnly "maven.modrinth:rei:${rei_version_fabric}"
     }
 
     // Jade - include if supported with Fabric version

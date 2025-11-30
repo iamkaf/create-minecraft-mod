@@ -84,8 +84,9 @@ dependencies {
         runtimeOnly "maven.modrinth:jei:${jei_version_forge}"
     }
 
-    if (project.hasProperty('rei_version') && rei_version != "NOT_AVAILABLE") {
-        runtimeOnly "maven.modrinth:rei:${rei_version}-forge"
+    // REI - include if supported with Forge version
+    if (project.hasProperty('rei_version_forge') && rei_version_forge != "NOT_AVAILABLE") {
+        runtimeOnly "maven.modrinth:rei:${rei_version_forge}"
     }
 
     // Jade - include if supported with Forge version
