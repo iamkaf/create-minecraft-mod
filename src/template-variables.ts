@@ -51,25 +51,25 @@ export interface TemplateVariables {
 	rei_version: string | undefined; // Legacy single version (will be migrated later)
 
 	// Loader-specific versions for dependencies
-	jei_version_fabric?: string;
-	jei_version_forge?: string;
-	jei_version_neoforge?: string;
+	jei_version_fabric?: string | undefined;
+	jei_version_forge?: string | undefined;
+	jei_version_neoforge?: string | undefined;
 
-	jade_version_fabric?: string;
-	jade_version_forge?: string;
-	jade_version_neoforge?: string;
+	jade_version_fabric?: string | undefined;
+	jade_version_forge?: string | undefined;
+	jade_version_neoforge?: string | undefined;
 
-	sodium_version_fabric?: string;
-	sodium_version_forge?: string;
-	sodium_version_neoforge?: string;
+	sodium_version_fabric?: string | undefined;
+	sodium_version_forge?: string | undefined;
+	sodium_version_neoforge?: string | undefined;
 
-	rei_version_fabric?: string;
-	rei_version_forge?: string;
-	rei_version_neoforge?: string;
+	rei_version_fabric?: string | undefined;
+	rei_version_forge?: string | undefined;
+	rei_version_neoforge?: string | undefined;
 
-	mod_menu_version_fabric?: string;
-	mod_menu_version_forge?: string;
-	mod_menu_version_neoforge?: string;
+	mod_menu_version_fabric?: string | undefined;
+	mod_menu_version_forge?: string | undefined;
+	mod_menu_version_neoforge?: string | undefined;
 	
 	// Publishing/Release Variables
 	curse_id: string;
@@ -434,25 +434,25 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 
 		// Loader-specific versions (passing through full versions with suffixes)
 
-		jei_version_fabric: jeiLoaderData.fabric_version || undefined,
-		jei_version_forge: jeiLoaderData.forge_version || undefined,
-		jei_version_neoforge: jeiLoaderData.neoforge_version || undefined,
+		jei_version_fabric: jeiLoaderData.fabric_version,
+		jei_version_forge: jeiLoaderData.forge_version,
+		jei_version_neoforge: jeiLoaderData.neoforge_version,
 
-		jade_version_fabric: jadeLoaderData.fabric_version || undefined,
-		jade_version_forge: jadeLoaderData.forge_version || undefined,
-		jade_version_neoforge: jadeLoaderData.neoforge_version || undefined,
+		jade_version_fabric: jadeLoaderData.fabric_version,
+		jade_version_forge: jadeLoaderData.forge_version,
+		jade_version_neoforge: jadeLoaderData.neoforge_version,
 
-		sodium_version_fabric: sodiumLoaderData.fabric_version || undefined,
-		sodium_version_forge: sodiumLoaderData.forge_version || undefined,
-		sodium_version_neoforge: sodiumLoaderData.neoforge_version || undefined,
+		sodium_version_fabric: sodiumLoaderData.fabric_version,
+		sodium_version_forge: sodiumLoaderData.forge_version,
+		sodium_version_neoforge: sodiumLoaderData.neoforge_version,
 
-		rei_version_fabric: reiLoaderData.fabric_version || undefined,
-		rei_version_forge: reiLoaderData.forge_version || undefined,
-		rei_version_neoforge: reiLoaderData.neoforge_version || undefined,
+		rei_version_fabric: reiLoaderData.fabric_version,
+		rei_version_forge: reiLoaderData.forge_version,
+		rei_version_neoforge: reiLoaderData.neoforge_version,
 
-		mod_menu_version_fabric: modmenuLoaderData.fabric_version || undefined,
-		mod_menu_version_forge: modmenuLoaderData.forge_version || undefined,
-		mod_menu_version_neoforge: modmenuLoaderData.neoforge_version || undefined,
+		mod_menu_version_fabric: modmenuLoaderData.fabric_version,
+		mod_menu_version_forge: modmenuLoaderData.forge_version,
+		mod_menu_version_neoforge: modmenuLoaderData.neoforge_version,
 
 		// Publishing/Release Variables
 		curse_id: DEFAULT_VARIABLES.curse_id!,

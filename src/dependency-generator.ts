@@ -110,7 +110,7 @@ export function generateRepositoryConfiguration(mod: Mod): RepositoryConfigurati
     const config = getDependencyConfig(id);
     return config?.type === 'mod';
   })) {
-    repoConfig.exclusiveContent.push(`
+    repoConfig.exclusiveContent?.push(`
         // Modrinth Maven for runtime mods
         exclusiveContent {
             forRepository {
@@ -162,13 +162,16 @@ export function generateDependencyConfiguration(mod: Mod): DependencyConfigurati
     for (const loader of mod.loaders) {
       const coords = depConfig.coordinates[loader as keyof typeof depConfig.coordinates];
       if (coords) {
-        const [group, artifact] = coords.split(':');
-        const dependencyType = loader === 'forge' ? 'implementation' :
-                              (artifact.includes('config') || artifact.includes('api')) ? 'modApi' : 'modImplementation';
+        const parts = coords.split(':');
+        if (parts.length >= 2) {
+          const [group, artifact] = parts;
+          const dependencyType = loader === 'forge' ? 'implementation' :
+                                (artifact!.includes('config') || artifact!.includes('api')) ? 'modApi' : 'modImplementation';
 
-        config.libraries[loader as keyof typeof config.libraries].push(
-          `${dependencyType} group: '${group}', name: '${artifact}', version: ${depConfig.versions.templateVariable}`
-        );
+          config.libraries[loader as keyof typeof config.libraries].push(
+            `${dependencyType} group: '${group}', name: '${artifact}', version: ${depConfig.versions.templateVariable}`
+          );
+        }
       }
     }
   }
@@ -210,7 +213,7 @@ export function generateHandlebarsData(mod: Mod, registryData: EchoRegistryAPIRe
     // Repository blocks for settings.gradle
     repositories: {
       development: repositoryConfig.repositories.join('\n'),
-      modrinth: repositoryConfig.exclusiveContent.join('\n')
+      modrinth: repositoryConfig.exclusiveContent?.join('\n') || ''
     },
 
     // Dependency blocks for build.gradle files

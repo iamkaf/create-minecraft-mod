@@ -9,6 +9,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 npm run start  # Executes via tsx: npx tsx ./src/index.ts
 ```
 
+### Code Quality and Type Checking
+```bash
+npm run check      # Full check: TypeScript + ESLint + tests
+npm run type-check # TypeScript compilation only
+npm run lint       # ESLint code quality checking
+npm run lint:fix   # Auto-fix ESLint issues
+```
+
 ### Testing and Verification
 Currently no test framework is set up. Manual verification involves creating test mods:
 
@@ -48,9 +56,10 @@ This is a sophisticated Node.js CLI tool that generates Minecraft mod projects f
 
 **Pipeline System** (`src/pipeline.ts`, `src/pipeline-runner.ts`)
 - `PipelineRunner` class with step-by-step execution and timing
-- 16+ pipeline stages with comprehensive error handling
+- 14 pipeline stages with comprehensive error handling (11/14 implemented - 79% complete)
 - Key pipeline functions: `cloneTemplate()`, `transformPackageStructure()`, `applyTemplateVariables()`, `renameClassFiles()`
 - Real-time progress tracking and structured result reporting
+- Two placeholder functions: `addSampleCode()` (scaffolding system) and `finalizeProject()` (validation/cleanup)
 
 **CLI Module** (`src/cli.ts`)
 - Minimal argument parsing without external dependencies
@@ -65,11 +74,11 @@ This is a sophisticated Node.js CLI tool that generates Minecraft mod projects f
 **Template System**
 - Templates stored in `templates/` directory: `base/`, `loaders/`, `license/`
 - Uses Handlebars for variable substitution: `{{variable}}` format (CLI), `${variable}` format (Gradle)
-- 100% Handlebars coverage verified across 43+ template files
+- 100% Handlebars coverage verified across 32 template files
 - Dynamic package structure transformation (`com/example/modtemplate/` → user package)
 
 **Template Variables** (`src/template-variables.ts`)
-- Comprehensive interface with 70+ variables for mod configuration
+- Comprehensive interface with 164 variables for mod configuration
 - Integrates with Echo Registry API for real-time addon version fetching
 - Handles Maven coordinate extraction and loader-specific versioning
 - Dynamic GitHub URL generation based on mod configuration

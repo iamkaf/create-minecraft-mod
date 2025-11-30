@@ -150,7 +150,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'amber',
     compatibleLoaders: ['fabric', 'forge', 'neoforge'],
     defaultSelection: true,
-    repository: MAVEN_REPOSITORIES['kaf-mod-resources'],
+    repository: MAVEN_REPOSITORIES['kaf-mod-resources'] ?? null,
     coordinates: {
       common: 'com.iamkaf.amber:amber-common',
       fabric: 'com.iamkaf.amber:amber-fabric',
@@ -178,7 +178,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'modmenu',
     compatibleLoaders: ['fabric'],
     defaultSelection: true,
-    repository: MAVEN_REPOSITORIES['modrinth'],
+    repository: MAVEN_REPOSITORIES['modrinth'] ?? null,
     coordinates: {
       fabric: 'maven.modrinth:modmenu'
     },
@@ -201,7 +201,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'jei',
     compatibleLoaders: ['fabric', 'forge', 'neoforge'],
     defaultSelection: false,
-    repository: MAVEN_REPOSITORIES['modrinth'],
+    repository: MAVEN_REPOSITORIES['modrinth'] ?? null,
     coordinates: {
       fabric: 'maven.modrinth:jei',
       forge: 'maven.modrinth:jei',
@@ -226,7 +226,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'rei',
     compatibleLoaders: ['fabric', 'forge', 'neoforge'],
     defaultSelection: false,
-    repository: MAVEN_REPOSITORIES['modrinth'],
+    repository: MAVEN_REPOSITORIES['modrinth'] ?? null,
     coordinates: {
       fabric: 'maven.modrinth:rei',
       forge: 'maven.modrinth:rei',
@@ -251,7 +251,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'jade',
     compatibleLoaders: ['fabric', 'forge', 'neoforge'],
     defaultSelection: false,
-    repository: MAVEN_REPOSITORIES['modrinth'],
+    repository: MAVEN_REPOSITORIES['modrinth'] ?? null,
     coordinates: {
       fabric: 'maven.modrinth:jade',
       forge: 'maven.modrinth:jade',
@@ -276,7 +276,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'sodium',
     compatibleLoaders: ['fabric', 'neoforge'], // Note: Forge has different Sodium rendering
     defaultSelection: false,
-    repository: MAVEN_REPOSITORIES['modrinth'],
+    repository: MAVEN_REPOSITORIES['modrinth'] ?? null,
     coordinates: {
       fabric: 'maven.modrinth:sodium',
       neoforge: 'maven.modrinth:sodium'
