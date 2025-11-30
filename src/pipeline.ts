@@ -4,8 +4,7 @@ import { ensureDirectoryExists } from "./util.js";
 import { promises as fs } from 'fs';
 import path from 'path';
 import Handlebars from 'handlebars';
-import { generateTemplateVariables, type TemplateVariables } from './template-variables.js';
-import { getUtilityModConfig } from './config/index.js';
+import { generateTemplateVariables } from './template-variables.js';
 
 /**
  * Pipeline step functions extracted from core.ts
@@ -307,17 +306,6 @@ export async function renameMixinFiles(mod: Mod): Promise<void> {
   }
 }
 
-export async function updateJavaPackageDeclarations(mod: Mod): Promise<void> {
-  const s = spinner();
-  s.start(`Updating Java package declarations...`);
-  try {
-    await delay(500); // Simulate work
-    s.stop(`Java package declarations updated successfully`);
-  } catch (error) {
-    s.stop(`Failed to update Java package declarations`, 1);
-    throw new Error(`Java package declaration update failed in ${mod.destinationPath}: ${error instanceof Error ? error.message : String(error)}`);
-  }
-}
 
 export async function applyTemplateVariables(mod: Mod): Promise<void> {
   const s = spinner();
@@ -363,6 +351,17 @@ export async function applyTemplateVariables(mod: Mod): Promise<void> {
 /**
  * Configuration and Content Pipeline Steps
  */
+
+/**
+ * User feedback function that echoes back loader configuration choices.
+ *
+ * NOTE: Actual loader configuration happens in earlier pipeline steps:
+ * - `cloneTemplate()` copies loader-specific template files
+ * - `applyTemplateVariables()` processes Handlebars variables in loader configs
+ *
+ * This function provides user confirmation by listing which loaders were selected
+ * and which configuration files were created for each loader.
+ */
 export async function configureLoaders(mod: Mod): Promise<void> {
   const s = spinner();
   s.start(`Configuring loaders: ${mod.loaders.join(', ')}...`);
@@ -381,7 +380,7 @@ export async function configureLoaders(mod: Mod): Promise<void> {
       statusMessage += `NeoForge (META-INF/neoforge.mods.toml + build.gradle)`;
     }
 
-    await delay(300); // Simulate processing time
+    await delay(300); // Allow time for user to read the confirmation
     s.stop(statusMessage);
   } catch (error) {
     s.stop(`Failed to configure loaders`, 1);
@@ -389,13 +388,24 @@ export async function configureLoaders(mod: Mod): Promise<void> {
   }
 }
 
+/**
+ * User feedback function that echoes back library selection choices.
+ *
+ * NOTE: Actual library configuration happens through the template system:
+ * - `generateTemplateVariables()` fetches library versions from Echo Registry API
+ * - `applyTemplateVariables()` injects version variables into gradle.properties
+ * - Template build.gradle files conditionally include selected libraries
+ *
+ * This function provides user confirmation of which development libraries
+ * were selected and configured in their project (e.g., Amber).
+ */
 export async function installLibraries(mod: Mod): Promise<void> {
   const s = spinner();
   s.start(`Installing libraries to "${mod.destinationPath}": ${mod.libraries.join(', ')}`);
   try {
-    // Note: This is currently a placeholder - actual library installation would happen here
-    // The libraries are already configured in the template via version variables
-    await delay(400);
+    // Libraries are configured via template variables, not JAR downloads
+    // The actual dependency injection happens in the build.gradle templates
+    await delay(400); // Allow time for user to read the confirmation
     s.stop(`Libraries configured successfully`);
   } catch (error) {
     s.stop(`Failed to install libraries`, 1);
@@ -403,13 +413,25 @@ export async function installLibraries(mod: Mod): Promise<void> {
   }
 }
 
+/**
+ * User feedback function that echoes back runtime utility mod selection choices.
+ *
+ * NOTE: Actual utility mod configuration happens through the template system:
+ * - `fetchCompatibilityVersions()` gets loader-specific versions from Echo Registry API
+ * - `generateTemplateVariables()` creates version variables like `jei_version_fabric`
+ * - `applyTemplateVariables()` injects these variables into gradle.properties
+ * - build.gradle templates use `modRuntimeOnly` or `runtimeOnly` dependencies
+ *
+ * This function provides user confirmation of which runtime utility mods
+ * were selected and configured in their project (e.g., JEI, Jade, Sodium).
+ */
 export async function installUtilityMods(mod: Mod): Promise<void> {
   const s = spinner();
   s.start(`Installing runtime mods to "${mod.destinationPath}": ${mod.mods.join(', ')}`);
   try {
-    // Import the utility mod installation function from core
-    // This will be refactored in the full implementation
-    await delay(600);
+    // Runtime mods are configured as Maven dependencies via build.gradle templates
+    // The actual dependency injection with loader-specific versions happens in template files
+    await delay(600); // Allow time for user to read the confirmation
     s.stop(`Utility mods installed successfully`);
   } catch (error) {
     s.stop(`Failed to install utility mods`, 1);
@@ -417,11 +439,23 @@ export async function installUtilityMods(mod: Mod): Promise<void> {
   }
 }
 
+/**
+ * PLACEHOLDER function for future sample code injection system.
+ *
+ * TODO: Implement anchor-based sample code injection with metadata.json
+ * - Support Copy and Inject modes for sample insertion
+ * - Handle multi-sample anchor processing
+ * - Manage collision resolution for conflicting injections
+ *
+ * Current template includes minimal sample code in entry classes.
+ * This function exists for future extensibility when implementing the
+ * advanced sample code architecture described in TODO.md.
+ */
 export async function addSampleCode(mod: Mod): Promise<void> {
   const s = spinner();
   s.start(`Adding sample code to "${mod.name}"...`);
   try {
-    await delay(400);
+    await delay(400); // Placeholder for future sample code injection
     s.stop(`Sample code added successfully`);
   } catch (error) {
     s.stop(`Failed to add sample code`, 1);
@@ -468,11 +502,25 @@ export async function applyLicense(mod: Mod): Promise<void> {
   }
 }
 
+/**
+ * PLACEHOLDER function for project finalization and validation.
+ *
+ * TODO: Implement project validation and cleanup logic:
+ * - Verify all required files exist and have correct permissions
+ * - Validate generated configuration files (build.gradle, mod metadata files)
+ * - Check that package structure matches user's specifications
+ * - Ensure template variable substitution was successful
+ * - Perform any final cleanup operations
+ * - Validate Gradle wrapper integrity and permissions
+ *
+ * This function should provide the final quality assurance check
+ * before handing over the project to the user.
+ */
 export async function finalizeProject(mod: Mod): Promise<void> {
   const s = spinner();
   s.start(`Finalizing project structure in "${mod.destinationPath}" for "${mod.name}"...`);
   try {
-    await delay(500);
+    await delay(500); // Placeholder for project validation and cleanup
     s.stop(`Project finalized successfully`);
   } catch (error) {
     s.stop(`Failed to finalize project`, 1);

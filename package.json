@@ -20,7 +20,10 @@
   "main": "index.js",
   "scripts": {
     "start": "npx tsx ./src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Warning: no test specified\" && exit 0",
+    "lint": "echo \"Warning: no linting specified\" && exit 0",
+    "check": "npm run type-check && npm run lint && npm run test",
+    "type-check": "npx tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",

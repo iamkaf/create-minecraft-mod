@@ -165,8 +165,30 @@ Libraries must use their respective development Maven repositories (NOT Modrinth
 
 ### 3. Mods (Optional, Removable)
 - **Description**: Optional utility mods for development experience (JEI, Jade, Sodium)
-- **Current Status**: ❌ Implemented incorrectly - downloading JARs directly
-- **Required Changes**: Transition to Modrinth Maven with exclusiveContent repository
+- **Current Status**: ✅ **COMPLETED** - Full conditionalization system implemented
+- **Implementation**: Dynamic buildSrc property detection with clean generation
+
+## ✅ **COMPLETED** - Optional Dependency Conditionalization System
+
+### Dynamic Property Detection (100% Complete)
+- ✅ **buildSrc dynamic processing** - No more hardcoded dependency lists, processes only existing properties
+- ✅ **Legacy variable cleanup** - All legacy `_version` usage removed from templates
+- ✅ **Clean project generation** - When no optional dependencies selected → completely clean gradle.properties
+- ✅ **Full compatibility API integration** - Loader-specific versions for all runtime mods with proper `NOT_AVAILABLE` handling
+- ✅ **Triple Handlebars fix** - Fixed HTML escaping for publishing dependencies (`{{{variable}}}`)
+- ✅ **No special cases** - All optional dependencies treated consistently
+- ✅ **Multi-loader verification** - All loaders (Fabric, Forge, NeoForge) build successfully
+
+### Template Cleanup (100% Complete)
+- ✅ **Removed suggests blocks** - Fabric fabric.mod.json no longer contains runtime mod suggestions
+- ✅ **Removed legacy dependencies** - Forge mods.toml and NeoForge neoforge.mods.toml cleaned of legacy dependencies
+- ✅ **Conditional logic only** - All optional dependencies use property checks: `if (project.hasProperty('prop') && prop != "NOT_AVAILABLE")`
+
+### Verification Results (November 29, 2025)
+- ✅ **Zero dependency test** - Projects with no optional deps generate completely clean with no traces
+- ✅ **All dependencies test** - Projects with all optional deps include correct loader-specific versions
+- ✅ **Triple Handlebars** - Publishing dependencies render as clean empty strings: `mod_modrinth_depends=""`
+- ✅ **buildSrc dynamic detection** - Only processes properties that actually exist in the project
 
 ### Modrinth Maven Integration Pattern:
 ```gradle

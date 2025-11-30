@@ -57,7 +57,6 @@ export class PipelineRunner {
       await this.runStep('class-rename', () => pipeline.renameClassFiles(mod), options);
       await this.runStep('mixin-rename', () => pipeline.renameMixinFiles(mod), options);
       await this.runStep('service-reg', () => pipeline.generateServiceRegistrationFiles(mod), options);
-      await this.runStep('package-update', () => pipeline.updateJavaPackageDeclarations(mod), options);
       await this.runStep('template-vars', () => pipeline.applyTemplateVariables(mod), options);
 
       // Configuration and content
@@ -162,7 +161,7 @@ export class PipelineRunner {
    * Get progress information for the current pipeline execution
    */
   getProgress(): { currentStep: number; totalSteps: number; percentage: number } {
-    const totalSteps = 15; // Approximate total number of pipeline steps
+    const totalSteps = 14; // Approximate total number of pipeline steps (removed redundant updateJavaPackageDeclarations)
     const currentStep = this.steps.length;
     const percentage = Math.round((currentStep / totalSteps) * 100);
 
