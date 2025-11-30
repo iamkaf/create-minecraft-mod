@@ -14,26 +14,33 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
     // Runtime mods (optional, removable)
-    {{#if mod_menu_version}}
-    modRuntimeOnly "maven.modrinth:modmenu:${mod_menu_version}-fabric"
-    {{/if}}
-    {{#if jei_version}}
-    modRuntimeOnly "maven.modrinth:jei:${jei_version}-fabric"
-    {{/if}}
-    {{#if rei_version}}
-    modRuntimeOnly "maven.modrinth:rei:${rei_version}-fabric"
-    {{/if}}
-    {{#if jade_version}}
-    modRuntimeOnly "maven.modrinth:jade:${jade_version}+fabric"
-    {{/if}}
-    {{#if sodium_version}}
-    modRuntimeOnly "maven.modrinth:sodium:${sodium_version}-fabric"
-    {{/if}}
+    if (project.hasProperty('mod_menu_version')) {
+        modRuntimeOnly "maven.modrinth:modmenu:${mod_menu_version}-fabric"
+    }
+
+    // JEI - include if supported with Fabric version
+    if (project.hasProperty('jei_version_fabric') && jei_version_fabric != "NOT_AVAILABLE") {
+        modRuntimeOnly "maven.modrinth:jei:${jei_version_fabric}"
+    }
+
+    if (project.hasProperty('rei_version') && rei_version != "NOT_AVAILABLE") {
+        modRuntimeOnly "maven.modrinth:rei:${rei_version}-fabric"
+    }
+
+    // Jade - include if supported with Fabric version
+    if (project.hasProperty('jade_version_fabric') && jade_version_fabric != "NOT_AVAILABLE") {
+        modRuntimeOnly "maven.modrinth:jade:${jade_version_fabric}"
+    }
+
+    // Sodium - include if supported with Fabric version
+    if (project.hasProperty('sodium_version_fabric') && sodium_version_fabric != "NOT_AVAILABLE") {
+        modRuntimeOnly "maven.modrinth:sodium:${sodium_version_fabric}"
+    }
 
     // Library dependencies (become required when selected)
-    {{#if amber_version}}
-    modImplementation "com.iamkaf.amber:amber-fabric:${amber_version}"
-    {{/if}}
+    if (project.hasProperty('amber_version') && amber_version != "NOT_AVAILABLE") {
+        modImplementation "com.iamkaf.amber:amber-fabric:${amber_version}"
+    }
     }
 
 sourceSets.main.resources.srcDir('src/generated/resources')

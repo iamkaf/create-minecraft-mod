@@ -6,23 +6,30 @@ plugins {
 
 dependencies {
     // Runtime mods (optional, removable)
-    {{#if jei_version}}
-    runtimeOnly "maven.modrinth:jei:${jei_version}-neoforge"
-    {{/if}}
-    {{#if rei_version}}
-    runtimeOnly "maven.modrinth:rei:${rei_version}-neoforge"
-    {{/if}}
-    {{#if jade_version}}
-    runtimeOnly "maven.modrinth:jade:${jade_version}+neoforge"
-    {{/if}}
-    {{#if sodium_version}}
-    runtimeOnly "maven.modrinth:sodium:${sodium_version}-neoforge"
-    {{/if}}
+
+    // JEI - include if supported with NeoForge version
+    if (project.hasProperty('jei_version_neoforge') && jei_version_neoforge != "NOT_AVAILABLE") {
+        runtimeOnly "maven.modrinth:jei:${jei_version_neoforge}"
+    }
+
+    if (project.hasProperty('rei_version') && rei_version != "NOT_AVAILABLE") {
+        runtimeOnly "maven.modrinth:rei:${rei_version}-neoforge"
+    }
+
+    // Jade - include if supported with NeoForge version
+    if (project.hasProperty('jade_version_neoforge') && jade_version_neoforge != "NOT_AVAILABLE") {
+        runtimeOnly "maven.modrinth:jade:${jade_version_neoforge}"
+    }
+
+    // Sodium - include if supported with NeoForge version
+    if (project.hasProperty('sodium_version_neoforge') && sodium_version_neoforge != "NOT_AVAILABLE") {
+        runtimeOnly "maven.modrinth:sodium:${sodium_version_neoforge}"
+    }
 
     // Library dependencies (become required when selected)
-    {{#if amber_version}}
-    implementation "com.iamkaf.amber:amber-neoforge:${amber_version}"
-    {{/if}}
+    if (project.hasProperty('amber_version') && amber_version != "NOT_AVAILABLE") {
+        implementation "com.iamkaf.amber:amber-neoforge:${amber_version}"
+    }
     }
 
 neoForge {

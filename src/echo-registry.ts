@@ -2,6 +2,7 @@
 // https://echo.iamkaf.com/
 
 import { getUtilityModProjectNames, getEchoRegistryUrl, getDependencyProjectNames } from './config/index.js';
+import { URL_BUILDERS } from './config/api-urls.js';
 
 export interface EchoRegistryAPIResponse {
   data: Data;
@@ -34,6 +35,19 @@ export interface DownloadUrls {
 }
 
 type McVersion = string;
+
+export interface CompatibilityResponse {
+  data: Record<string, Record<string, LoaderVersions>>;
+  success: boolean;
+  timestamp: Date;
+  cached_at: Date;
+}
+
+export interface LoaderVersions {
+  forge: string | null;
+  neoforge: string | null;
+  fabric: string | null;
+}
 
 /**
  * Extract clean version from Maven coordinates by removing loader suffixes
@@ -94,4 +108,15 @@ export async function fetchDependencyVersions(
   const response = await fetch(apiUrl);
   const data = await response.json();
   return data as EchoRegistryAPIResponse;
+}
+
+export async function fetchCompatibilityVersions(
+  minecraftVersion: string,
+  projects: string[]
+): Promise<CompatibilityResponse> {
+  const apiUrl = URL_BUILDERS.echoRegistryCompatibility(minecraftVersion, projects);
+
+  const response = await fetch(apiUrl);
+  const data = await response.json();
+  return data as CompatibilityResponse;
 }

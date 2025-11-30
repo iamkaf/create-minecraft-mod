@@ -78,20 +78,25 @@ dependencies {
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
 
     // Runtime mods (optional, removable)
-    {{#if jei_version}}
-    runtimeOnly "maven.modrinth:jei:${jei_version}-forge"
-    {{/if}}
-    {{#if rei_version}}
-    runtimeOnly "maven.modrinth:rei:${rei_version}-forge"
-    {{/if}}
-    {{#if jade_version}}
-    runtimeOnly "maven.modrinth:jade:${jade_version}+forge"
-    {{/if}}
+
+    // JEI - include if supported with Forge version
+    if (project.hasProperty('jei_version_forge') && jei_version_forge != "NOT_AVAILABLE") {
+        runtimeOnly "maven.modrinth:jei:${jei_version_forge}"
+    }
+
+    if (project.hasProperty('rei_version') && rei_version != "NOT_AVAILABLE") {
+        runtimeOnly "maven.modrinth:rei:${rei_version}-forge"
+    }
+
+    // Jade - include if supported with Forge version
+    if (project.hasProperty('jade_version_forge') && jade_version_forge != "NOT_AVAILABLE") {
+        runtimeOnly "maven.modrinth:jade:${jade_version_forge}"
+    }
 
     // Library dependencies (become required when selected)
-    {{#if amber_version}}
-    implementation "com.iamkaf.amber:amber-forge:${amber_version}"
-    {{/if}}
+    if (project.hasProperty('amber_version') && amber_version != "NOT_AVAILABLE") {
+        implementation "com.iamkaf.amber:amber-forge:${amber_version}"
+    }
     }
 
 publishing {

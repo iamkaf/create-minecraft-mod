@@ -1,6 +1,6 @@
 import type { Mod } from "./types.js";
-import { fetchDependencyVersions, type EchoRegistryAPIResponse } from "./echo-registry.js";
-import { UTILITY_MODS, type UtilityModConfig, URL_BUILDERS, getDependencyConfig, getLibraryDependencies, getModDependencies } from "./config/index.js";
+import { fetchDependencyVersions, fetchCompatibilityVersions, type EchoRegistryAPIResponse, type CompatibilityResponse } from "./echo-registry.js";
+import { UTILITY_MODS, type UtilityModConfig, URL_BUILDERS, getDependencyConfig, getLibraryDependencies, getModDependencies, getDependencyProjectNames } from "./config/index.js";
 import { extractCleanVersion } from "./echo-registry.js";
 
 /**
@@ -47,11 +47,21 @@ export interface TemplateVariables {
 	parchment_minecraft: string;
 	parchment_version: string;
 	mod_menu_version: string;
-	amber_version: string | undefined; // Optional
-		jei_version: string | undefined; // Optional
-	rei_version: string | undefined; // Optional
-	jade_version: string | undefined; // Optional
-	sodium_version: string | undefined; // Optional
+	amber_version: string | undefined; // Legacy single version (from its own repository, not Modrinth)
+	rei_version: string | undefined; // Legacy single version (will be migrated later)
+
+	// Loader-specific versions for dependencies
+	jei_version_fabric?: string;
+	jei_version_forge?: string;
+	jei_version_neoforge?: string;
+
+	jade_version_fabric?: string;
+	jade_version_forge?: string;
+	jade_version_neoforge?: string;
+
+	sodium_version_fabric?: string;
+	sodium_version_forge?: string;
+	sodium_version_neoforge?: string;
 	
 	// Publishing/Release Variables
 	curse_id: string;
@@ -109,6 +119,27 @@ export interface TemplateVariables {
 	update_json_url: string;
 	homepage_url: string;
 }
+
+/**
+ * Helper function to extract loader-specific versions from compatibility API data
+ */
+const extractLoaderVersions = (
+	compatibilityData: CompatibilityResponse['data'],
+	projectSlug: string,
+	minecraftVersion: string
+) => {
+	const projectData = compatibilityData[projectSlug]?.[minecraftVersion];
+	if (!projectData) return {};
+
+	return {
+		fabric_version: projectData.fabric || "NOT_AVAILABLE",
+		forge_version: projectData.forge || "NOT_AVAILABLE",
+		neoforge_version: projectData.neoforge || "NOT_AVAILABLE",
+		supports_fabric: projectData.fabric !== null,
+		supports_forge: projectData.forge !== null,
+		supports_neoforge: projectData.neoforge !== null
+	};
+};
 
 /**
  * Default values for template variables
@@ -194,7 +225,18 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 	const mixin_refmap_name = `${mod.id}.refmap.json`;
 	const java_compatibility_level = `JAVA_${mod.javaVersion}`;
 
-	// Try to fetch version information from Echo Registry
+	// Try to fetch compatibility information from Echo Registry
+	let compatibilityData = {} as CompatibilityResponse['data'];
+	try {
+		const allProjects = getDependencyProjectNames();
+		const compatibilityResponse = await fetchCompatibilityVersions(mod.minecraftVersion, allProjects);
+		compatibilityData = compatibilityResponse.data;
+	} catch (error) {
+		console.warn(`Failed to fetch compatibility data: ${error}`);
+		// Fallback to existing single-version system
+	}
+
+	// Also fetch loader/core versions from legacy API for now
 	let fetchedVersions = {} as EchoRegistryAPIResponse;
 	try {
 		fetchedVersions = await fetchDependencyVersions(mod.minecraftVersion);
@@ -248,13 +290,6 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 		return extractCleanVersion(dependency.coordinates);
 	};
 
-	// Extract individual mod variables
-	const mod_menu_version = extractModVersion("modmenu", "modmenu");
-	const jei_version = extractModVersion("jei", "jei");
-	const rei_version = extractModVersion("rei", "rei");
-	const jade_version = extractModVersion("jade", "jade");
-	const sodium_version = extractModVersion("sodium", "sodium");
-
 	// Library versions using the new dependency system with Maven coordinate extraction
 	const extractLibraryVersion = (libraryId: string, registryName: string): string | undefined => {
 		if (!mod.libraries.includes(libraryId)) return undefined;
@@ -266,7 +301,17 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 		return extractCleanVersion(dependency.coordinates);
 	};
 
+	// Extract loader-specific versions using compatibility API (for Modrinth mods only)
+	const jeiLoaderData = extractLoaderVersions(compatibilityData, "jei", mod.minecraftVersion);
+	const jadeLoaderData = extractLoaderVersions(compatibilityData, "jade", mod.minecraftVersion);
+	const sodiumLoaderData = extractLoaderVersions(compatibilityData, "sodium", mod.minecraftVersion);
+
+	// Amber uses its own repository, not Modrinth - use legacy system
 	const amber_version = extractLibraryVersion("amber", "amber");
+
+	// For modmenu, fall back to legacy system for now
+	const mod_menu_version = extractModVersion("modmenu", "modmenu");
+	const rei_version = extractModVersion("rei", "rei");
 
 	// Calculate version ranges
 	const calculateMinecraftRange = (version: string): string => {
@@ -339,11 +384,22 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 		parchment_minecraft,
 		parchment_version: parchment_version || "",
 		mod_menu_version: mod_menu_version || "",
-		amber_version,
-		jei_version,
 		rei_version,
-		jade_version,
-		sodium_version,
+		amber_version, // Legacy single version for Amber (not from Modrinth)
+
+		// Loader-specific versions (passing through full versions with suffixes)
+
+		jei_version_fabric: jeiLoaderData.fabric_version || undefined,
+		jei_version_forge: jeiLoaderData.forge_version || undefined,
+		jei_version_neoforge: jeiLoaderData.neoforge_version || undefined,
+
+		jade_version_fabric: jadeLoaderData.fabric_version || undefined,
+		jade_version_forge: jadeLoaderData.forge_version || undefined,
+		jade_version_neoforge: jadeLoaderData.neoforge_version || undefined,
+
+		sodium_version_fabric: sodiumLoaderData.fabric_version || undefined,
+		sodium_version_forge: sodiumLoaderData.forge_version || undefined,
+		sodium_version_neoforge: sodiumLoaderData.neoforge_version || undefined,
 
 		// Publishing/Release Variables
 		curse_id: DEFAULT_VARIABLES.curse_id!,

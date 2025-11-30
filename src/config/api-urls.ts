@@ -96,6 +96,12 @@ export const URL_BUILDERS = {
     `${API_ENDPOINTS.ECHO_REGISTRY.BASE_URL}${API_ENDPOINTS.ECHO_REGISTRY.VERSIONS.DEPENDENCIES(minecraftVersion, projects)}`,
 
   /**
+   * Build Echo Registry compatibility URL
+   */
+  echoRegistryCompatibility: (minecraftVersion: string, projects: string[]) =>
+    `${API_ENDPOINTS.ECHO_REGISTRY.BASE_URL}/projects/compatibility?projects=${projects.join(',')}&versions=${minecraftVersion}`,
+
+  /**
    * Build GitHub repository URL
    */
   githubRepo: (username: string, repo: string) =>
