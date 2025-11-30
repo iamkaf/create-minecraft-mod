@@ -366,7 +366,8 @@ export async function generateTemplateVariables(mod: Mod): Promise<TemplateVaria
 
 		for (const libId of libraries) {
 			const config = getDependencyConfig(libId);
-			if (config) {
+			if (config && !config.foundation && config.type === 'library') {
+				// Only include user-selected library dependencies, not foundation dependencies or runtime mods
 				// Add Modrinth dependency ID
 				modrinthDeps.push(libId);
 

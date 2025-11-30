@@ -350,7 +350,7 @@ const getLibraryOptions = () => {
 };
 
 const libraries = await multiselect({
-	message: "Include Libraries?",
+	message: "Include Optional Libraries?",
 	options: getLibraryOptions(),
 	initialValues: getLibraryDependencies()
 		.filter(lib => lib.defaultSelection)
@@ -362,7 +362,18 @@ if (isCancel(libraries)) {
 	process.exit(0);
 }
 
-mod.libraries = libraries as string[];
+// Auto-include foundation dependencies based on selected loaders
+const { getFoundationDependencies } = await import('./config/dependencies.js');
+const foundationDeps = getFoundationDependencies()
+	.filter(dep => dep.compatibleLoaders.some(loader => mod.loaders.includes(loader)))
+	.map(dep => dep.id);
+
+// Combine foundation (auto-included) + user-selected libraries
+mod.libraries = [...foundationDeps, ...(libraries as string[])];
+
+// Auto-included foundation dependencies are handled transparently
+// Foundation dependencies are automatically included based on selected loaders
+// This provides the necessary build tools without user intervention
 
 //
 // ─── UTILITY MODS ─────────────────────────────────────────

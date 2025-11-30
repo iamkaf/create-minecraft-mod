@@ -26,6 +26,7 @@ export interface DependencyConfig {
   registryProjectName: string;
   compatibleLoaders: ModLoader[];
   defaultSelection: boolean;
+  foundation: boolean; // Auto-managed vs user-selectable
   repository: MavenRepository | null;
   coordinates: MavenCoordinates;
   ui: {
@@ -79,6 +80,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'fabric-api',
     compatibleLoaders: ['fabric'],
     defaultSelection: true,
+    foundation: true,
     repository: null, // Uses Fabric Maven repository
     coordinates: {
       fabric: 'net.fabricmc.fabric-api:fabric-api'
@@ -104,6 +106,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'loom',
     compatibleLoaders: ['fabric'],
     defaultSelection: true,
+    foundation: true,
     repository: null,
     coordinates: {
       fabric: 'net.fabricmc:fabric-loom'
@@ -127,6 +130,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'moddev-gradle',
     compatibleLoaders: ['neoforge'],
     defaultSelection: true,
+    foundation: true,
     repository: null,
     coordinates: {
       neoforge: 'net.neoforged:moddevgradle'
@@ -150,6 +154,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'amber',
     compatibleLoaders: ['fabric', 'forge', 'neoforge'],
     defaultSelection: true,
+    foundation: false,
     repository: MAVEN_REPOSITORIES['kaf-mod-resources'] ?? null,
     coordinates: {
       common: 'com.iamkaf.amber:amber-common',
@@ -178,6 +183,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'modmenu',
     compatibleLoaders: ['fabric'],
     defaultSelection: true,
+    foundation: false,
     repository: MAVEN_REPOSITORIES['modrinth'] ?? null,
     coordinates: {
       fabric: 'maven.modrinth:modmenu'
@@ -201,6 +207,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'jei',
     compatibleLoaders: ['fabric', 'forge', 'neoforge'],
     defaultSelection: false,
+    foundation: false,
     repository: MAVEN_REPOSITORIES['modrinth'] ?? null,
     coordinates: {
       fabric: 'maven.modrinth:jei',
@@ -226,6 +233,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'rei',
     compatibleLoaders: ['fabric', 'forge', 'neoforge'],
     defaultSelection: false,
+    foundation: false,
     repository: MAVEN_REPOSITORIES['modrinth'] ?? null,
     coordinates: {
       fabric: 'maven.modrinth:rei',
@@ -251,6 +259,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'jade',
     compatibleLoaders: ['fabric', 'forge', 'neoforge'],
     defaultSelection: false,
+    foundation: false,
     repository: MAVEN_REPOSITORIES['modrinth'] ?? null,
     coordinates: {
       fabric: 'maven.modrinth:jade',
@@ -276,6 +285,7 @@ export const DEPENDENCIES: DependencyConfig[] = [
     registryProjectName: 'sodium',
     compatibleLoaders: ['fabric', 'neoforge'], // Note: Forge has different Sodium rendering
     defaultSelection: false,
+    foundation: false,
     repository: MAVEN_REPOSITORIES['modrinth'] ?? null,
     coordinates: {
       fabric: 'maven.modrinth:sodium',
@@ -368,10 +378,24 @@ export function validateDependencyIds(ids: string[]): { valid: string[]; invalid
 }
 
 /**
- * Get library dependencies for selection options
+ * Get foundation dependencies (auto-managed, not user-selectable)
+ */
+export function getFoundationDependencies(): DependencyConfig[] {
+  return DEPENDENCIES.filter(dep => dep.foundation === true);
+}
+
+/**
+ * Get user-selectable dependencies (not auto-managed)
+ */
+export function getUserSelectableDependencies(): DependencyConfig[] {
+  return DEPENDENCIES.filter(dep => dep.foundation !== true);
+}
+
+/**
+ * Get library dependencies for selection options (excludes foundation dependencies)
  */
 export function getLibraryDependencies(): DependencyConfig[] {
-  return getDependenciesByType('library');
+  return getDependenciesByType('library').filter(dep => dep.foundation !== true);
 }
 
 /**
