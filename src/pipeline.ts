@@ -708,7 +708,12 @@ export async function openInVSCode(mod: Mod): Promise<void> {
   s.start(`Opening ${mod.destinationPath} in VS Code...`);
   try {
     const { execa } = await import('execa');
-    execa('code', [mod.destinationPath], { cwd: mod.destinationPath, detached: true }).unref();
+    const child = execa('code', [mod.destinationPath], {
+      cwd: mod.destinationPath,
+      detached: true,
+      stdio: 'ignore'  // Prevents hanging on stdio
+    });
+    child.unref();      // Allow parent process to exit independently
     s.stop(`Opened ${mod.destinationPath} in VS Code`);
   } catch (error) {
     s.stop(`Failed to open VS Code`, 1);
@@ -721,7 +726,12 @@ export async function openInIntelliJ(mod: Mod): Promise<void> {
   s.start(`Opening ${mod.destinationPath} in IntelliJ IDEA...`);
   try {
     const { execa } = await import('execa');
-    execa('idea', [mod.destinationPath], { cwd: mod.destinationPath, detached: true }).unref();
+    const child = execa('idea', [mod.destinationPath], {
+      cwd: mod.destinationPath,
+      detached: true,
+      stdio: 'ignore'  // Prevents hanging on stdio
+    });
+    child.unref();      // Allow parent process to exit independently
     s.stop(`Opened ${mod.destinationPath} in IntelliJ IDEA`);
   } catch (error) {
     s.stop(`Failed to open IntelliJ IDEA`, 1);

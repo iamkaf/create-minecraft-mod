@@ -79,6 +79,7 @@ async function validateAndRun(mod: Mod): Promise<void> {
 	try {
 		await runPipeline(mod);
 		outro("✅ Mod created successfully! Time to start developing.");
+		process.exit(0);
 	} catch (error) {
 		cancel(`❌ Failed to create mod: ${error instanceof Error ? error.message : String(error)}`);
 		process.exit(1);
