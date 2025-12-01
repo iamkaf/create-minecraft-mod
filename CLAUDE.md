@@ -20,13 +20,30 @@ npm run lint:fix   # Auto-fix ESLint issues
 ### Testing and Verification
 Currently no test framework is set up. Manual verification involves creating test mods:
 
+## Development Testing (Use for Local Changes)
+When testing local changes to the CLI codebase, ALWAYS use the local development commands:
+
 ```bash
-# Create a test mod to verify functionality
-cd /tmp && npx create-minecraft-mod test-mod --ci-mode --name "Test Mod" --author "Test" --id "testmod"
+# Test interactive mode with local changes
+npm run start /tmp/test-mod
+
+# Test headless mode with local changes
+npm run start /tmp/test-mod --ci-mode --name "Test Mod" --author "Test" --id "testmod"
 
 # Verify with comprehensive build test
 cd test-mod && ./gradlew build
 ```
+
+## Published Version Testing (Use for Published Package Testing)
+```bash
+# Create a test mod to verify functionality using published version
+cd /tmp && npx create-minecraft-mod test-mod --ci-mode --name "Test Mod" --author "Test" --id "testmod"
+```
+
+## ⚠️ CRITICAL DISTINCTION
+- **Local Development**: Use `npm run start` to test your modified source code
+- **Published Testing**: Use `npx create-minecraft-mod` to test the published npm package
+- **NEVER use npx to test local source changes** - it downloads from npm registry, not your local code
 
 ## Architecture Overview
 
