@@ -3,7 +3,10 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['src/utils/__tests__/**/*.test.ts'],
+    include: [
+      'src/utils/__tests__/**/*.test.ts',
+      'src/interactive/__tests__/**/*.test.ts'
+    ],
     coverage: {
       provider: 'v8',
       thresholds: {
@@ -12,6 +15,7 @@ export default defineConfig({
       exclude: [
         'node_modules/',
         'src/utils/__tests__/**',
+        'src/interactive/__tests__/**',
         '**/*.d.ts',
         '**/*.config.*'
       ]
