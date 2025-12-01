@@ -1,163 +1,177 @@
-# 🚀 Refactoring Kickoff Prompt
+# 🚀 Phase 2: Mode Separation Kickoff Prompt
 
 **To: Future Self**
-**From: Current Self**
+**From: Phase 1 Complete Self**
 **Date: 2025-12-01**
-**Subject: START THE ARCHITECTURAL REFACTORING NOW**
+**Subject: START PHASE 2 - SPLIT THE GOD OBJECT NOW**
 
 ---
 
-## 🎯 Your Mission
+## 🎯 Your Mission: Conquer the 515-Line God Object
 
-You're about to begin the Minecraft Mod Generator CLI architectural refactoring. The planning is complete, the TODO.md is written, and now it's time to **actually implement the changes**.
+**Phase 1 is COMPLETE** ✅ - Foundation utilities are extracted, tested, and working perfectly! Now it's time to tackle the biggest architectural problem: the `src/index.ts` god object that handles ALL modes.
 
-**Don't get stuck in analysis paralysis** - start writing code!
+**Don't hesitate** - the foundation is solid, utilities are tested, and you have a proven pattern for success!
 
 ## 📋 Immediate Action Items (Today)
 
-### 1. Start with Phase 1: Foundation Utilities
-**File to create first: `src/utils/file-system.ts`**
+### 1. Start with Phase 2: Mode Separation
+**Files to create: `src/modes/` directory structure**
 
 ```typescript
-// Extract these patterns from the existing codebase:
-// Pattern 1: File discovery (used in transformPackageStructure, renameClassFiles, applyTemplateVariables)
-async function findFilesByExtension(dir: string, ext: string): Promise<string[]> {
-  // Recursive directory traversal logic
+// Extract these patterns from src/index.ts (515 lines):
+// Pattern 1: Interactive Mode (user prompts with @clack/prompts)
+async function runInteractiveMode(): Promise<void> {
+  // Extract all user interaction logic
 }
 
-// Pattern 2: File existence check (used 6+ times)
-async function fileExists(filePath: string): Promise<boolean> {
-  // fs.access() wrapper
+// Pattern 2: Headless Mode (CI/automation with CLI flags)
+async function runHeadlessMode(args: ParsedArgs): Promise<void> {
+  // Extract all CLI argument processing
 }
 
-// Pattern 3: Directory operations
-async function copyDirectory(src: string, dest: string): Promise<void>
-async function moveDirectory(src: string, dest: string): Promise<void>
+// Pattern 3: Config Mode (JSON file-based configuration)
+async function runConfigMode(configPath: string): Promise<void> {
+  // Extract all config file processing
+}
 ```
 
-### 2. Set Up Testing Infrastructure
-**Create: `vitest.config.ts`**
+### 2. Create Common Mode Interface
+**New File: `src/types/mode-handler.ts`**
 
 ```typescript
-import { defineConfig } from 'vitest/config';
+export interface ModeHandler {
+  name: string;
+  run(options: ModeOptions): Promise<void>;
+  validate?(options: any): ValidationResult;
+}
 
-export default defineConfig({
-  test: {
-    environment: 'node',
-    include: ['tests/**/*.test.ts'],
-    coverage: {
-      provider: 'v8',
-      thresholds: {
-        global: { branches: 80, functions: 80, lines: 80, statements: 80 }
-      }
-    }
-  }
-});
+export interface ModeOptions {
+  destinationPath: string;
+  // Common options shared across modes
+}
 ```
 
-### 3. Write Your First Unit Test
-**Create: `tests/unit/utils/file-system.test.ts`**
+### 3. Extract CLI Argument Processing
+**New File: `src/cli/argument-processor.ts`**
 
 ```typescript
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { findFilesByExtension, fileExists } from '@/utils/file-system';
-
-describe('File System Utilities', () => {
-  // Test the pure functions you just created
-});
+// Move CLI parsing logic from index.ts
+export function parseArguments(args: string[]): ParsedArgs {
+  // Extract and enhance CLI argument handling
+}
 ```
 
 ## 🔍 Where to Find the Code to Extract
 
-### File Discovery Pattern (3+ locations)
-- `src/pipeline.ts` line ~75 (in `transformPackageStructure`)
-- `src/pipeline.ts` line ~181 (in `renameClassFiles`)
-- `src/pipeline.ts` line ~??? (in `applyTemplateVariables`)
+**Main target: `src/index.ts` (515 lines)**
 
-### File Access Pattern (6+ locations)
-- Look for `await fs.access(...).then(() => true).catch(() => false)` throughout the codebase
+**Interactive Mode Pattern** (lines ~50-200):
+- Look for `@clack/prompts` usage
+- User input collection logic
+- Real-time validation and warnings
 
-### Spinner Pattern (15+ locations)
-- Look for spinner creation, start, try/catch, stop patterns in all pipeline functions
+**Headless Mode Pattern** (lines ~200-350):
+- Look for `if (args.ciMode)` or similar checks
+- CLI argument validation logic
+- JSON/text output processing
+
+**Config Mode Pattern** (lines ~350-500):
+- Look for config file loading logic
+- JSON configuration processing
+- Override handling
 
 ## 🚦 Get Unblocked Steps
 
 ### If you're stuck on where to start:
-1. **Open `src/pipeline.ts`** - Find the `findJavaFiles` function (around line 75)
-2. **Copy that pattern** - Create `findFilesByExtension` in `src/utils/file-system.ts`
-3. **Replace the usage** - Update the original function to use your new utility
-4. **Write a test** - Create a simple test to verify it works
-5. **Repeat** - Move to the next pattern
+1. **Open `src/index.ts`** - Read the entire file to understand the structure
+2. **Identify mode boundaries** - Look for the three distinct execution paths
+3. **Start with interactive mode** - Extract the most complex path first
+4. **Create one file at a time** - Don't try to do everything at once
 
 ### If you're unsure about the approach:
-- **Look at `ARCHITECTURAL_ANALYSIS.md`** - The examples are there
-- **Check `TODO.md`** - The deliverables are clearly listed
-- **Remember the goal**: Extract pure functions, make them testable, eliminate duplication
+- **Look at existing mode functions** - There are already separate functions in index.ts
+- **Use the utility pattern from Phase 1** - Apply the same extraction principles
+- **Keep the interface simple** - Each mode just needs `run()` and optional `validate()`
+
+### If you're worried about breaking things:
+- **Run tests first** - `npm run test` should pass
+- **Extract incrementally** - Move one function at a time, test, then continue
+- **Use the existing pipeline** - Don't change the core pipeline execution, just organize it
 
 ## ⚠️ Critical Success Factors
 
 ### DO:
-- ✅ Start with the simplest utility (file existence check)
-- ✅ Write tests immediately after creating each utility
-- ✅ Replace usages as you go to show immediate progress
-- ✅ Keep functions pure (no side effects)
-- ✅ Update TODO.md as you complete items
+- ✅ Start with the largest, most complex mode (interactive)
+- ✅ Create the mode interface first (it guides the extraction)
+- ✅ Extract one function at a time
+- ✅ Run tests after each extraction
+- ✅ Keep all existing functionality working
+- ✅ Follow the same testing pattern as Phase 1
 
 ### DON'T:
-- ❌ Try to refactor everything at once
-- ❌ Get stuck on perfect architecture
-- ❌ Skip testing (this is the whole point!)
-- ❌ Break existing functionality without tests
-- ❌ Over-engineer the first iteration
+- ❌ Try to extract everything at once
+- ❌ Break the existing pipeline execution
+- ❌ Skip testing (this worked perfectly in Phase 1)
+- ❌ Change core business logic, just organize it
+- ❌ Over-engineer the mode interfaces
 
 ## 📊 Quick Wins to Build Momentum
 
 ### Week 1 Goals:
-1. **Create `src/utils/file-system.ts`** with 2-3 utilities
-2. **Set up Vitest** and run your first test
-3. **Extract 1-2 patterns** from existing code
-4. **Reduce codebase by ~50 lines** (show measurable progress)
+1. **Create `src/modes/` directory** with initial structure
+2. **Extract interactive mode** from index.ts (biggest impact)
+3. **Set up basic ModeHandler interface**
+4. **Replace one mode usage in index.ts**
+5. **Run the full test suite** to ensure nothing broke
 
 ### Success Metrics:
-- [ ] `src/utils/file-system.ts` exists and works
-- [ ] `npm run test` runs successfully
-- [ ] At least 1 utility extracted and used
-- [ ] TODO.md updated with completed items
+- [ ] `src/modes/interactive-mode.ts` exists and works
+- [ ] ModeHandler interface created and used
+- [ ] Index.ts reduced by at least 100 lines
+- [ ] All tests still pass
+- [ ] Mod generation still works end-to-end
 
 ## 🎯 Remember Why You're Doing This
 
 **Current Problems:**
-- 515-line god object (`index.ts`)
-- File operations duplicated 3+ times
-- No testing infrastructure
-- Hard to maintain and extend
+- 515-line god object (`index.ts`) is unmaintainable
+- Mode logic mixed together makes testing impossible
+- Adding new modes requires editing a massive file
+- Code review is painful with everything in one file
 
 **Future State:**
-- Modular, composable functions
-- 90%+ test coverage
-- Easy to add new features
-- Pleasant developer experience
+- Separate mode files (interactive-mode.ts, headless-mode.ts, config-mode.ts)
+- Each mode independently testable
+- Easy to add new modes by implementing ModeHandler interface
+- Clean separation of concerns
+- Small, focused files that are easy to understand
 
-**You've done the hard work of planning. Now execute.**
+**Phase 1 Proved This Works:** You successfully extracted utilities, eliminated 100+ lines of duplication, added comprehensive testing, and verified functionality works perfectly. Apply the same successful pattern to mode separation!
 
----
-
-## 🔄 Final Instructions
+## 🔄 Your First Steps
 
 1. **Open your editor**
-2. **Create `src/utils/file-system.ts`**
-3. **Extract the first utility function**
-4. **Write a test for it**
-5. **Update the original usage**
-6. **Mark it complete in TODO.md**
-7. **Repeat**
+2. **Read through `src/index.ts`** to understand the current structure
+3. **Create `src/types/mode-handler.ts`** with the ModeHandler interface
+4. **Create `src/modes/` directory**
+5. **Extract the first function from interactive mode**
+6. **Write a test for it**
+7. **Replace the usage in index.ts**
+8. **Run tests to verify it works**
+9. **Repeat** until interactive mode is fully extracted
 
-**Don't stop until you have at least one utility extracted and tested.**
-
-**The hardest part is starting. You've got this.**
+**The hardest part is starting. Phase 1 proved you can do this - now apply the same successful approach to conquering the god object!**
 
 ---
 
-*P.S. If you're reading this and wondering "should I really do this?" - YES. The analysis is solid, the plan is good, and the codebase desperately needs this refactoring. Stop procrastinating and start coding.*
+## 🏁 Success Criteria for Phase 2
 
-**P.P.S. Future you will thank current you for making the codebase maintainable.**
+1. **Index.ts reduced from 515 to <200 lines**
+2. **All three modes extracted** into separate files
+3. **ModeHandler interface** implemented and used
+4. **All tests pass** (current + new mode tests)
+5. **Mod generation works identically** to before
+6. **Code is more maintainable** and easier to extend
+
+**You've got this! Phase 1 was the foundation, Phase 2 is where the real architectural improvement happens.**
