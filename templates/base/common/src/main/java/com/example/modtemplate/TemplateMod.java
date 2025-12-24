@@ -19,19 +19,4 @@ public class {{main_class_name}} {
     public static void init() {
         Constants.LOG.info("Initializing {} on {}...", Constants.MOD_NAME, Services.PLATFORM.getPlatformName());
     }
-
-    /**
-     * Example interaction handler demonstrating how shared logic can be used
-     * across loaders. Replace or remove it as needed.
-     */
-    public static InteractionResult onPlayerEntityInteract(Player player, Level level, InteractionHand hand, Entity entity) {
-        Constants.LOG.info(
-                "{} interacted with {} using hand {} in level {}",
-                player.getName().getString(),
-                entity.getName().getString(),
-                hand,
-                level.dimension().location()
-        );
-        return InteractionResult.PASS;
-    }
 }

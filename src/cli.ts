@@ -22,6 +22,7 @@ export interface CliArgs {
   libraries?: string;
   mods?: string;
   license?: string;
+  gradleVersion?: string;
   skipGradle?: boolean;
   skipGit?: boolean;
   skipIde?: boolean;
@@ -119,6 +120,12 @@ function parseArguments(args: string[]): CliArgs {
       case "--license":
         if (nextArg && !nextArg.startsWith("-")) {
           result.license = nextArg;
+          i++; // Skip next argument
+        }
+        break;
+      case "--gradle-version":
+        if (nextArg && !nextArg.startsWith("-")) {
+          result.gradleVersion = nextArg;
           i++; // Skip next argument
         }
         break;

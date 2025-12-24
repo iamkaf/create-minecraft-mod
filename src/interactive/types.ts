@@ -28,6 +28,7 @@ export interface DependenciesResult {
 export interface OptionalResult {
 	samples: string[];
 	license: string;
+	gradleVersion: string;
 	postActions: string[];
 }
 
@@ -61,6 +62,7 @@ export function configToMod(config: InteractiveConfig): Mod {
 		mods: config.mods,
 		samples: config.samples,
 		license: config.license,
+		gradleVersion: config.gradleVersion,
 		postActions: config.postActions,
 	};
 }

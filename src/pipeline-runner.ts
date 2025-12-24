@@ -226,6 +226,8 @@ export function createModFromArgs(args: any, destinationPath: string): Mod {
     samples: [],
     postActions: ['git-init', 'run-gradle'],
     license: args.license || 'mit',
+    gradleVersion: args.gradleVersion,
+    fabricLoomVersion: args.fabricLoomVersion,
     destinationPath
   };
 }

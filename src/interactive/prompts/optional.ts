@@ -11,6 +11,7 @@ import { validateResult, validateResults } from '../utils.js';
 export interface OptionalResult {
 	samples: string[];
 	license: string;
+	gradleVersion: string;
 	postActions: string[];
 }
 
@@ -54,6 +55,20 @@ export async function collectOptionalFeatures(): Promise<OptionalResult> {
 	const selectedLicense = validateResult(license);
 
 	//
+	// ─── GRADLE VERSION ────────────────────────────────────────
+	//
+	const gradleVersion = await select({
+		message: "Gradle Version",
+		options: [
+			{ value: "8.14", label: "8.14 (Recommended)" },
+			{ value: "9.2.0", label: "9.2.0" },
+		],
+		initialValue: "8.14",
+	});
+
+	const selectedGradleVersion = validateResult(gradleVersion);
+
+	//
 	// ─── POST-CREATION ACTIONS ─────────────────────────────────
 	//
 	const postActions = await multiselect({
@@ -71,6 +86,7 @@ export async function collectOptionalFeatures(): Promise<OptionalResult> {
 	return {
 		samples: selectedSamples,
 		license: selectedLicense,
+		gradleVersion: selectedGradleVersion,
 		postActions: selectedPostActions,
 	};
 }

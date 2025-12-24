@@ -15,4 +15,5 @@ export interface Mod {
   license: string;
   destinationPath: string;
   fabricLoomVersion?: string;
+  gradleVersion?: string;
 }

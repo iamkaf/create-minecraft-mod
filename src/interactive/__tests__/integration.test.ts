@@ -79,6 +79,7 @@ describe('Phase 2 Integration Tests', () => {
 			// Optional
 			samples: ['item-registration'],
 			license: 'mit',
+			gradleVersion: '8.14',
 			postActions: ['git-init'],
 		};
 

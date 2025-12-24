@@ -17,6 +17,7 @@ export interface ModConfigFile {
     minecraftVersion?: string;
     javaVersion?: string;
     fabricLoomVersion?: string;
+    gradleVersion?: string;
   };
   options: {
     loaders: string[];
@@ -100,6 +101,9 @@ function validateConfigFile(config: ModConfigFile): void {
     }
     if (config.mod.package && typeof config.mod.package !== 'string') {
       errors.push('mod.package must be a string if provided');
+    }
+    if (config.mod.gradleVersion && typeof config.mod.gradleVersion !== 'string') {
+      errors.push('mod.gradleVersion must be a string if provided');
     }
   }
 
@@ -192,7 +196,7 @@ export function configToMod(config: ModConfigFile, destinationPath: string): Mod
     }
   }
 
-  const result: Mod & { fabricLoomVersion?: string } = {
+  const result: Mod & { fabricLoomVersion?: string; gradleVersion?: string } = {
     name: config.mod.name,
     author: config.mod.author,
     id: config.mod.id,
@@ -215,6 +219,11 @@ export function configToMod(config: ModConfigFile, destinationPath: string): Mod
     result.fabricLoomVersion = config.mod.fabricLoomVersion;
   }
 
+  // Only include gradleVersion if it's defined (for exactOptionalPropertyTypes)
+  if (config.mod.gradleVersion) {
+    result.gradleVersion = config.mod.gradleVersion;
+  }
+
   return result;
 }
 
@@ -233,6 +242,7 @@ export interface CliArgs {
   libraries?: string;
   utility?: string;
   license?: string;
+  gradleVersion?: string;
   skipGradle?: boolean;
   skipGit?: boolean;
   skipIde?: boolean;
@@ -269,6 +279,9 @@ export function mergeConfigWithArgs(config: ModConfigFile, args: CliArgs): ModCo
   }
   if (args.javaVersion && typeof args.javaVersion === 'string') {
     merged.mod.javaVersion = args.javaVersion.trim();
+  }
+  if (args.gradleVersion && typeof args.gradleVersion === 'string') {
+    merged.mod.gradleVersion = args.gradleVersion.trim();
   }
 
   // Override options with validation

@@ -25,6 +25,7 @@ Options:
   --libraries <list> Comma-separated libraries
   --mods <list>       Comma-separated runtime mods
   --license <type>   License type
+  --gradle-version <version> Gradle version (8.14,9.2.0)
   --skip-gradle      Skip Gradle execution
   --skip-git         Skip git initialization
   --skip-ide         Skip IDE opening
