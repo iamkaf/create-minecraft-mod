@@ -45,11 +45,12 @@ dependencies {
     }
     }
 
-sourceSets.main.resources.srcDir('src/generated/resources')
+// sourceSets.main.resources.srcDir('src/generated/resources')
 
 fabricApi {
     configureDataGeneration {
         client = true
+        outputDirectory = file('../common/src/main/generated')
     }
 }
 

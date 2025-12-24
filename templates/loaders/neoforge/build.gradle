@@ -31,7 +31,7 @@ dependencies {
     if (project.hasProperty('amber_version') && amber_version != "NOT_AVAILABLE") {
         implementation "com.iamkaf.amber:amber-neoforge:${amber_version}"
     }
-    }
+}
 
 neoForge {
     version = neoforge_version
@@ -66,7 +66,7 @@ neoForge {
     }
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+// sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 publisher {
     // Setup the required API keys. You only need to define the keys for

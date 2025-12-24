@@ -247,6 +247,13 @@ export async function generateServiceRegistrationFiles(mod: Mod): Promise<void> 
     // Generate service files for each loader that uses them
     const loaders = ['fabric', 'forge', 'neoforge'];
 
+    // Loader name to PascalCase mapping for platform helper class names
+    const loaderNameMap: Record<string, string> = {
+      fabric: 'Fabric',
+      forge: 'Forge',
+      neoforge: 'NeoForge',
+    };
+
     for (const loader of loaders) {
       const loaderDir = path.join(mod.destinationPath, loader);
 
@@ -271,7 +278,7 @@ export async function generateServiceRegistrationFiles(mod: Mod): Promise<void> 
       }
 
       // Determine the platform helper class for this loader
-      const platformHelperClass = `${targetPackage}.platform.${loader.charAt(0).toUpperCase() + loader.slice(1)}PlatformHelper`;
+      const platformHelperClass = `${targetPackage}.platform.${loaderNameMap[loader]}PlatformHelper`;
 
       // Write the service registration file
       const serviceFile = path.join(servicesDir, serviceInterface);
